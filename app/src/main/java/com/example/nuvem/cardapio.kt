@@ -30,30 +30,65 @@ class cardapio : AppCompatActivity() {
         }
 
         // 2. Busca o RecyclerView do seu activity_cardapio.xml
-        // ⚠️ Troque 'recyclerViewProdutos' pelo ID exato que estiver no seu XML!
         val recyclerView = findViewById<RecyclerView>(R.id.recyclerViewProdutos)
 
         // 3. Associa o LayoutManager e o Adapter ao RecyclerView
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = produtoAdapter
 
-        // 4. Busca os dados da API na nuvem
-        carregarProdutos()
+        // 4. Recebe os parâmetros de busca enviados pela telaPesquisa
+        val tipoBusca = intent.getStringExtra("TIPO_BUSCA")
+        val valorBusca = intent.getStringExtra("VALOR_BUSCA")
+
+        // 5. Busca os dados na nuvem aplicando os filtros
+        carregarProdutos(tipoBusca, valorBusca)
     }
 
-    private fun carregarProdutos() {
+    private fun carregarProdutos(tipoBusca: String?, valorBusca: String?) {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
                 // Faz a chamada ao Node/Aiven usando o Retrofit
                 val listaProdutos = RetrofitClient.apiService.obterProdutos()
 
+                // Aplica a filtragem baseada no tipo e valor recebidos
+                val listaFiltrada = when (tipoBusca) {
+                    "TITULO" -> {
+                        if (!valorBusca.isNullOrBlank()) {
+                            // Filtra os produtos cuja descrição contenha o texto buscado (ignorando maiúsculas/minúsculas)
+                            listaProdutos.filter { produto ->
+                                produto.descricao.contains(valorBusca, ignoreCase = true)
+                            }
+                        } else {
+                            listaProdutos
+                        }
+                    }
+                    "GRUPO" -> {
+                        if (!valorBusca.isNullOrBlank()) {
+                            listaProdutos.filter { produto ->
+                                Log.d("TESTE_FILTRO", "ID Produto: ${produto.grupoId} | ID Buscado: $valorBusca")
+
+                                // Converte ambos para Int para ignorar os zeros à esquerda ("003" vira 3)
+                                val idProdutoInt = produto.grupoId.toString().toIntOrNull()
+                                val idBuscadoInt = valorBusca.toIntOrNull()
+
+                                idProdutoInt != null && idBuscadoInt != null && idProdutoInt == idBuscadoInt
+                            }
+                        } else {
+                            listaProdutos
+                        }
+                    }
+                    else -> listaProdutos
+                }
+
+
                 withContext(Dispatchers.Main) {
-                    if (listaProdutos.isNotEmpty()) {
-                        // Envia os dados para o ListAdapter preencher o CardView!
-                        produtoAdapter.submitList(listaProdutos)
-                        Log.d("API_SUCESSO", "Produtos carregados: ${listaProdutos.size}")
+                    if (listaFiltrada.isNotEmpty()) {
+                        // Envia os dados filtrados para o ListAdapter preencher o CardView!
+                        produtoAdapter.submitList(listaFiltrada)
+                        Log.d("API_SUCESSO", "Produtos exibidos: ${listaFiltrada.size}")
                     } else {
-                        Log.w("API_AVISO", "A lista retornou vazia!")
+                        produtoAdapter.submitList(emptyList())
+                        Log.w("API_AVISO", "Nenhum produto encontrado para esse filtro!")
                     }
                 }
             } catch (e: Exception) {

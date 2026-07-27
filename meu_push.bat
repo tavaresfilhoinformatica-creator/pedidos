@@ -1,17 +1,18 @@
 @echo off
-echo Limpando e iniciando envio para o GitHub...
+echo Salvando e enviando alteracoes para o GitHub...
 
-git init
+:: 1. Prepara todos os arquivos alterados
 git add .
-git commit -m "Primeiro commit do projeto pedidos"
-git branch -M main
 
-@rem Remove o remoto antigo se existir e adiciona o correto
-git remote remove origin 2>nul
-git remote add origin https://github.com/tavaresfilhoinformatica-creator/pedidos.git
+:: 2. Pede para voce digitar a mensagem da alteracao
+set /p mensagem="Digite o que voce alterou no projeto: "
 
-git push -u origin main
+:: 3. Faz o commit usando a mensagem que voce digitou
+git commit -m "%mensagem%"
+
+:: 4. Envia para o GitHub
+git push origin main
 
 echo.
-echo Processo concluido!
+echo Alteracoes enviadas com sucesso!
 pause
