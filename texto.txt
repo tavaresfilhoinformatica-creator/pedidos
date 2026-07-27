@@ -1,0 +1,11 @@
+Iniciando o envio do projeto para o GitHub...
+Reinitialized existing Git repository in C:/tico/android/Nuvem/.git/
+[main 35a1685] Primeiro commit do projeto pedidos
+ 1 file changed, 13 insertions(+)
+ create mode 100644 push.bat
+error: remote origin already exists.
+remote: Repository not found.
+fatal: repository 'https://github.com/meunome-creator/pedidos.git/' not found
+
+Processo concluido!
+Pressione qualquer tecla para continuar. . .

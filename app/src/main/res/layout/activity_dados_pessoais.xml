@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true">
+
+  <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:orientation="vertical"
+      android:padding="16dp">
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"
+        android:text="Meus Dados"
+        android:textSize="22sp"
+        android:textStyle="bold" />
+
+    <!-- Campo Nome -->
+    <EditText
+        android:id="@+id/etNome"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Nome Completo"
+        android:inputType="textPersonName"
+        android:layout_marginBottom="12dp"/>
+
+    <!-- Campo CPF -->
+    <EditText
+        android:id="@+id/etCpf"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
+        android:maxLength="11"
+        android:hint="CPF"
+        android:inputType="number" />
+
+    <!-- Campo Telefone -->
+    <EditText
+        android:id="@+id/etTelefone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Telefone"
+        android:inputType="phone"
+        android:layout_marginBottom="12dp"/>
+
+    <!-- Campo CEP -->
+    <EditText
+        android:id="@+id/etCep"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="CEP"
+        android:inputType="number"
+        android:maxLength="8"
+        android:layout_marginBottom="12dp"/>
+
+    <!-- Campo Endereço -->
+    <EditText
+        android:id="@+id/etEndereco"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Endereço (Rua, Nº)"
+        android:inputType="textPostalAddress"
+        android:layout_marginBottom="12dp"/>
+
+    <!-- Campo Bairro -->
+    <EditText
+        android:id="@+id/etBairro"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Bairro"
+        android:inputType="text"
+        android:layout_marginBottom="12dp"/>
+
+    <!-- Campo Municipio -->
+    <EditText
+        android:id="@+id/etMunicipio"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Município"
+        android:inputType="text"
+        android:layout_marginBottom="12dp"/>
+
+    <!-- Campo Estado -->
+    <EditText
+        android:id="@+id/etEstado"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Estado (UF)"
+        android:inputType="text"
+        android:maxLength="2"
+        android:layout_marginBottom="24dp"/>
+
+    <!-- Botão Salvar -->
+    <Button
+        android:id="@+id/btnSalvar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:backgroundTint="#044907"
+        android:onClick="salvarDados"
+        android:text="Salvar Dados"
+        android:textColor="#E7EDE6E6"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <!-- Botão Meus Pedidos -->
+    <Button
+        android:id="@+id/btnMeusPedidos"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:backgroundTint="#1976D2"
+        android:text="Meus Pedidos"
+        android:textColor="#E9FFFFFF"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <!-- Botão Voltar -->
+    <Button
+        android:id="@+id/btnVoltar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:backgroundTint="#757575"
+        android:onClick="telaInicial"
+        android:text="Voltar"
+        android:textColor="#E4FFFFFF"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+  </LinearLayout>
+</ScrollView>
