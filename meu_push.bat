@@ -8,7 +8,7 @@ git branch -M main
 
 @rem Remove o remoto antigo se existir e adiciona o correto
 git remote remove origin 2>nul
-git remote add origin https://github.com/SEU-USUARIO-REAL/pedidos.git
+git remote add origin https://github.com/tavaresfilhoinformatica-creator/pedidos.git
 
 git push -u origin main
 
