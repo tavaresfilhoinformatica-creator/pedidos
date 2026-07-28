@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.PopupMenu
@@ -18,8 +19,8 @@ class MainActivity : AppCompatActivity() {
 
     }
     fun encerrar_aplicativo(view : View) {
-        val btnEncerrar = findViewById<Button>(R.id.btnEncerrar)
-        btnEncerrar.setOnClickListener { finishAffinity() }
+        val txtSair = findViewById<TextView>(R.id.txtSair)
+       txtSair.setOnClickListener { finishAffinity() }
     }
     fun dadosPessoais(view : View) {
         val intent = Intent(this, activity_dados_pessoais::class.java)

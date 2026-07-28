@@ -11,11 +11,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class cardapio : AppCompatActivity() {
 
-    // 1. Instancia o seu ProdutoAdapter
     private val produtoAdapter = ProdutoAdapter()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -29,70 +27,60 @@ class cardapio : AppCompatActivity() {
             insets
         }
 
-        // 2. Busca o RecyclerView do seu activity_cardapio.xml
         val recyclerView = findViewById<RecyclerView>(R.id.recyclerViewProdutos)
-
-        // 3. Associa o LayoutManager e o Adapter ao RecyclerView
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = produtoAdapter
 
-        // 4. Recebe os parâmetros de busca enviados pela telaPesquisa
         val tipoBusca = intent.getStringExtra("TIPO_BUSCA")
         val valorBusca = intent.getStringExtra("VALOR_BUSCA")
 
-        // 5. Busca os dados na nuvem aplicando os filtros
-        carregarProdutos(tipoBusca, valorBusca)
+        // 1. Sincroniza dados com a nuvem em segundo plano
+        sincronizarProdutosComNuvem()
+
+        // 2. Consulta no Room com base no filtro
+        carregarProdutosDoRoom(tipoBusca, valorBusca)
     }
 
-    private fun carregarProdutos(tipoBusca: String?, valorBusca: String?) {
+    private fun sincronizarProdutosComNuvem() {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
-                // Faz a chamada ao Node/Aiven usando o Retrofit
-                val listaProdutos = RetrofitClient.apiService.obterProdutos()
-
-                // Aplica a filtragem baseada no tipo e valor recebidos
-                val listaFiltrada = when (tipoBusca) {
-                    "TITULO" -> {
-                        if (!valorBusca.isNullOrBlank()) {
-                            // Filtra os produtos cuja descrição contenha o texto buscado (ignorando maiúsculas/minúsculas)
-                            listaProdutos.filter { produto ->
-                                produto.descricao.contains(valorBusca, ignoreCase = true)
-                            }
-                        } else {
-                            listaProdutos
-                        }
-                    }
-                    "GRUPO" -> {
-                        if (!valorBusca.isNullOrBlank()) {
-                            listaProdutos.filter { produto ->
-                                Log.d("TESTE_FILTRO", "ID Produto: ${produto.grupoId} | ID Buscado: $valorBusca")
-
-                                // Converte ambos para Int para ignorar os zeros à esquerda ("003" vira 3)
-                                val idProdutoInt = produto.grupoId.toString().toIntOrNull()
-                                val idBuscadoInt = valorBusca.toIntOrNull()
-
-                                idProdutoInt != null && idBuscadoInt != null && idProdutoInt == idBuscadoInt
-                            }
-                        } else {
-                            listaProdutos
-                        }
-                    }
-                    else -> listaProdutos
-                }
-
-
-                withContext(Dispatchers.Main) {
-                    if (listaFiltrada.isNotEmpty()) {
-                        // Envia os dados filtrados para o ListAdapter preencher o CardView!
-                        produtoAdapter.submitList(listaFiltrada)
-                        Log.d("API_SUCESSO", "Produtos exibidos: ${listaFiltrada.size}")
-                    } else {
-                        produtoAdapter.submitList(emptyList())
-                        Log.w("API_AVISO", "Nenhum produto encontrado para esse filtro!")
-                    }
-                }
+                val produtosNuvem = RetrofitClient.apiService.obterProdutos()
+                val produtoDao = AppDatabase.getDatabase(applicationContext).produtoDao()
+                produtoDao.inserirProdutos(produtosNuvem)
             } catch (e: Exception) {
-                Log.e("API_ERRO", "Erro ao buscar produtos: ${e.message}", e)
+                Log.e("ROOM_SYNC", "Erro ao atualizar produtos da nuvem: ${e.message}")
+            }
+        }
+    }
+
+    private fun carregarProdutosDoRoom(tipoBusca: String?, valorBusca: String?) {
+        val produtoDao = AppDatabase.getDatabase(this).produtoDao()
+
+        lifecycleScope.launch {
+            val flowProdutos = when (tipoBusca) {
+                "TITULO" -> {
+                    if (!valorBusca.isNullOrBlank()) {
+                        produtoDao.buscarPorTitulo(valorBusca.trim())
+                    } else {
+                        produtoDao.obterTodos()
+                    }
+                }
+                "GRUPO" -> {
+                    val textoLimpo = valorBusca?.trim()
+                    if (!textoLimpo.isNullOrEmpty()) {
+                        // Passa a String limpa diretamente para o DAO
+                        produtoDao.buscarPorGrupo(textoLimpo)
+                    } else {
+                        produtoDao.obterTodos()
+                    }
+                }
+                else -> produtoDao.obterTodos()
+            }
+
+            // Observa os dados em tempo real vindos do Room já ordenados em ordem alfabética
+            flowProdutos.collect { lista ->
+                produtoAdapter.submitList(lista)
+                Log.d("ROOM_SUCESSO", "Produtos encontrados: ${lista.size}")
             }
         }
     }

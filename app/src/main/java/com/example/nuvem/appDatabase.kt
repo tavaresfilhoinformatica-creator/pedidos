@@ -16,7 +16,7 @@ import androidx.room.TypeConverters
         Pagamento:: class,
         DadosPessoais:: class
     ],
-    version = 1,
+    version = 2,
     exportSchema = false // Evita avisos de exportação de schema durante o build
 )
 // 2. Registro do nosso conversor para BigDecimal e Datas funcionar em todo o app
@@ -47,7 +47,7 @@ abstract class AppDatabase : RoomDatabase() {
                 )
                     // Usado provisoriamente para testes. Se você mudar a estrutura
                     // das entidades, ele limpa o banco anterior em vez de travar o app por falta de migração.
-                    .fallbackToDestructiveMigration()
+                    .fallbackToDestructiveMigration(dropAllTables = true)
                     .build()
 
                 INSTANCE = instance

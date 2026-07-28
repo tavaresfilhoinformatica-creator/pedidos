@@ -5,6 +5,8 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#180202"
+    android:backgroundTint="#1F0202"
     android:orientation="vertical"
     android:padding="16dp"
     tools:context=".telaPesquisa">
@@ -30,6 +32,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Por Título"
+            android:textColor="#EFEBEB"
             android:textSize="16sp"
             android:textStyle="bold" />
 
@@ -39,6 +42,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:text="Por Grupo"
+            android:textColor="#E4DBDB"
             android:textSize="16sp"
             android:textStyle="bold" />
     </RadioGroup>
@@ -49,7 +53,9 @@
         android:layout_height="wrap_content"
         android:ems="10"
         android:hint="Digite aqui, em branco para todos"
-        android:inputType="text" />
+        android:inputType="text"
+        android:textColor="#EFEAEA"
+        android:textColorHint="#F2EBEB" />
 
     <!-- Spinner posicionado após a caixa de texto e antes dos botões -->
     <Spinner
@@ -58,6 +64,8 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="16dp"
+        android:background="#EFE9E9"
+        android:backgroundTint="#180101"
         android:padding="8dp" />
 
     <Button
@@ -67,6 +75,7 @@
         android:backgroundTint="#0AA810"
         android:onClick="pesquisar"
         android:text="Pesquisar"
+        android:textColor="#F0EEEE"
         android:textSize="18sp"
         android:textStyle="bold" />
 
@@ -78,6 +87,7 @@
         android:backgroundTint="#4D4949"
         android:onClick="telaInicial"
         android:text="Voltar"
+        android:textColor="#EDE3E3"
         android:textSize="18sp"
         android:textStyle="bold" />
 

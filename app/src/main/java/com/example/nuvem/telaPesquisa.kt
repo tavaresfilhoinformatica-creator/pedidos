@@ -10,16 +10,13 @@ import android.widget.EditText
 import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.Spinner
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.isInvisible
-import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
-import com.google.android.material.textfield.TextInputEditText
 import kotlinx.coroutines.launch
-import kotlin.jvm.java
 
 class telaPesquisa : AppCompatActivity() {
 
@@ -41,45 +38,47 @@ class telaPesquisa : AppCompatActivity() {
         // Instância do banco local (Room)
         val grupoDao = AppDatabase.getDatabase(this).GrupoDao()
 
-        // 1. Observa o Flow do Room em tempo real e atualiza o Spinner
+        // Configuração do Adapter do Spinner uma única vez
+        val adapter = ArrayAdapter<Grupo>(
+            this,
+            android.R.layout.simple_spinner_item,
+            mutableListOf()
+        ).apply {
+            setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        }
+        spinnerGrupos.adapter = adapter
+
+        // 1. Observa o Flow do Room em tempo real e atualiza a lista do Adapter existente
         lifecycleScope.launch {
             grupoDao.buscarGrupo().collect { listaGrupos ->
                 Log.d("TESTE_ROOM", "Quantidade de grupos no Room: ${listaGrupos.size}")
 
-                val listaExibicao = if (listaGrupos.isEmpty()) {
-                    listOf(Grupo(codigo = 0, descricao = "Carregando grupos..."))
+                adapter.clear()
+                if (listaGrupos.isEmpty()) {
+                    adapter.add(Grupo(codigo = "000", descricao = "Carregando grupos..."))
                 } else {
-                    listaGrupos
+                    adapter.addAll(listaGrupos)
                 }
-
-                val adapter = ArrayAdapter(
-                    this@telaPesquisa,
-                    android.R.layout.simple_spinner_item,
-                    listaExibicao
-                )
-                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-                spinnerGrupos.adapter = adapter
+                adapter.notifyDataSetChanged()
             }
         }
 
         // 2. Busca os dados no servidor (Aiven via Retrofit) e salva no Room
         lifecycleScope.launch {
             try {
-                // Busca da API (certifique-se de ter o método buscarGrupos() ou similar no ApiService)
                 val gruposDaNuvem = RetrofitClient.apiService.obterGrupos()
-
-                // Insere no banco local Room (isso fará o Flow do passo 1 disparar automaticamente)
                 grupoDao.inserirGrupo(gruposDaNuvem)
             } catch (e: Exception) {
                 Log.e("TESTE_ROOM", "Erro ao carregar dados da nuvem: ${e.message}")
             }
         }
+
         val radioGroup = findViewById<RadioGroup>(R.id.radioOpcoes)
         val opcaoTitulo = findViewById<RadioButton>(R.id.tituloOpcao)
-        val btnPesquisar = findViewById<Button>(R.id.btnPesquisar) // Substitua pelo ID do seu botão
+        val btnPesquisar = findViewById<Button>(R.id.btnPesquisar)
         val textoBusca = findViewById<EditText>(R.id.pesqEdit)
 
-        // 2. Define o foco inicial (como você já fez)
+        // Define o foco inicial
         opcaoTitulo.requestFocus()
 
         // 3. Ação do botão Pesquisar
@@ -94,11 +93,16 @@ class telaPesquisa : AppCompatActivity() {
                     intent.putExtra("VALOR_BUSCA", texto)
                 }
                 R.id.grupoOpcao -> {
-                    // Pega o objeto Grupo selecionado no Spinner
                     val grupoSelecionado = spinnerGrupos.selectedItem as? Grupo
+
+                    // Validação para evitar prosseguir se ainda estiver carregando
+                    if (grupoSelecionado == null || grupoSelecionado.codigo == "000") {
+                        Toast.makeText(this, "Aguarde o carregamento dos grupos...", Toast.LENGTH_SHORT).show()
+                        return@setOnClickListener
+                    }
+
                     intent.putExtra("TIPO_BUSCA", "GRUPO")
-                    // Passa o código ou a descrição do grupo
-                    intent.putExtra("VALOR_BUSCA", grupoSelecionado?.codigo.toString())
+                    intent.putExtra("VALOR_BUSCA", grupoSelecionado.codigo)
                 }
             }
 
@@ -106,12 +110,9 @@ class telaPesquisa : AppCompatActivity() {
         }
     }
 
-
-    // Função movida para fora do onCreate para funcionar com o android:onClick no XML
     fun telaInicial(view: View) {
         val intent = Intent(this, MainActivity::class.java)
         startActivity(intent)
-
     }
 
     fun pesquisar(view: View) {

@@ -11,7 +11,7 @@ import kotlinx.coroutines.launch
 class ProdutoViewModel(private val produtoDao: ProdutoDao) : ViewModel() {
 
     // Mantém a lista de produtos atualizada em tempo real via Room
-    val listaProdutos: StateFlow<List<Produto>> = produtoDao.buscarProduto()
+    val listaProdutos: StateFlow<List<Produto>> = produtoDao.obterTodos()
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),

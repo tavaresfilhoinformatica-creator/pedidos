@@ -29,7 +29,7 @@ class AppRepository(
 
 
     fun obterProdutosLocais(): Flow<List<Produto>> {
-        return produtoDao.buscarProduto() // ajuste para a sua função do ProdutoDao
+        return produtoDao.obterTodos()// ajuste para a sua função do ProdutoDao
     }
 
 

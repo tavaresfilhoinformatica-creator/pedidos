@@ -1,11 +1,53 @@
-"GRUPO" -> {
-                        if (!valorBusca.isNullOrBlank()) {
-                            // Filtra os produtos pelo código do grupo (ajuste 'grupo' se a propriedade no seu Produto tiver outro nome)
-                            listaProdutos.filter { produto ->
-                                produto.grupoId.toString() == valorBusca
-                            }
-                        } else {
-                            listaProdutos
-                        }
-                    }
-                    else -> listaProdutos
+
+
+package com.example.nuvem
+
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+import java.math.BigDecimal
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
+
+@Entity(tableName = "pedido")
+data class Pedido(
+    @PrimaryKey(autoGenerate = true) val numero: Int = 0,
+    val cpf: String,
+
+    // CORRIGIDO: Usa o Calendar para pegar a data corrente no formato AAAA-MM-DD
+    val data_pedido: String = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Calendar.getInstance().time),
+
+    val total_pedido: BigDecimal,
+    val endereco_entrega: String,
+    val bairro_entrega: String,
+    val cep_entrega: String,
+    val telefone_entrega: String
+)
+
+
+
+package com.example.nuvem
+
+import androidx.room.Entity
+import androidx.room.ForeignKey
+import java.math.BigDecimal
+
+@Entity(
+    tableName = "itempedido",
+    // Declarando a relação com a tabela pedido
+    foreignKeys = [
+        ForeignKey(
+            entity = Pedido::class,        // A classe da tabela Pai
+            parentColumns = ["numero"],    // O campo chave na tabela Pedido
+            childColumns = ["pedido"]      // O campo que faz o vínculo aqui na tabela ItemPedido
+        )
+    ], // <-- Essa vírgula aqui é obrigatória para separar os parâmetros
+    primaryKeys = ["pedido", "produto"]
+)
+data class ItemPedido(
+    val pedido: String,
+    val produto: String,
+    val quantidade: Int,
+    val preco_venda: BigDecimal,
+    val total_item: BigDecimal
+)

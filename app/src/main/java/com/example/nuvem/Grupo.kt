@@ -6,7 +6,7 @@ import com.google.gson.annotations.SerializedName
 
 @Entity(tableName = "grupo")
 data class Grupo(
-    @PrimaryKey val codigo: Long,
+    @PrimaryKey val codigo: String,
     val descricao: String
 ) {
     // O Spinner utiliza o toString() para saber qual texto mostrar

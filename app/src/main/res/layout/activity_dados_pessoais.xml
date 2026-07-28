@@ -4,13 +4,16 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#100101"
     android:fillViewport="true">
 
   <LinearLayout
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:orientation="vertical"
-      android:padding="16dp">
+      android:padding="16dp"
+      android:scrollbarStyle="outsideInset"
+      android:scrollbars="vertical">
 
 
     <TextView
@@ -18,6 +21,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="24dp"
         android:text="Meus Dados"
+        android:textColor="#E6DDDD"
         android:textSize="22sp"
         android:textStyle="bold" />
 
@@ -26,9 +30,11 @@
         android:id="@+id/etNome"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
         android:hint="Nome Completo"
         android:inputType="textPersonName"
-        android:layout_marginBottom="12dp"/>
+        android:textColor="#F8F4F4"
+        android:textColorHint="#E2D7D7" />
 
     <!-- Campo CPF -->
     <EditText
@@ -36,65 +42,80 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="12dp"
-        android:maxLength="11"
         android:hint="CPF"
-        android:inputType="number" />
+        android:inputType="number"
+        android:maxLength="11"
+        android:textColor="#F2EBEB"
+        android:textColorHint="#E9E4E4" />
 
     <!-- Campo Telefone -->
     <EditText
         android:id="@+id/etTelefone"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
         android:hint="Telefone"
         android:inputType="phone"
-        android:layout_marginBottom="12dp"/>
+        android:textColor="#E6DCDC"
+        android:textColorHint="#E6DFDF" />
 
     <!-- Campo CEP -->
     <EditText
         android:id="@+id/etCep"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
         android:hint="CEP"
         android:inputType="number"
         android:maxLength="8"
-        android:layout_marginBottom="12dp"/>
+        android:textColor="#E9E1E1"
+        android:textColorHint="#E0D6D6" />
 
     <!-- Campo Endereço -->
     <EditText
         android:id="@+id/etEndereco"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
         android:hint="Endereço (Rua, Nº)"
         android:inputType="textPostalAddress"
-        android:layout_marginBottom="12dp"/>
+        android:textColor="#F4F2F2"
+        android:textColorHint="#E2D4D4" />
 
     <!-- Campo Bairro -->
     <EditText
         android:id="@+id/etBairro"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
         android:hint="Bairro"
         android:inputType="text"
-        android:layout_marginBottom="12dp"/>
+        android:textColor="#F0E9E9"
+        android:textColorHint="#E6D7D7" />
 
     <!-- Campo Municipio -->
     <EditText
         android:id="@+id/etMunicipio"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
         android:hint="Município"
         android:inputType="text"
-        android:layout_marginBottom="12dp"/>
+        android:textColor="#EFE7E7"
+        android:textColorHint="#EFE4E4" />
 
     <!-- Campo Estado -->
     <EditText
         android:id="@+id/etEstado"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"
         android:hint="Estado (UF)"
         android:inputType="text"
         android:maxLength="2"
-        android:layout_marginBottom="24dp"/>
+        android:scrollbars="vertical"
+        android:textColor="#EBE4E4"
+        android:textColorHint="#F0E9E9" />
 
     <!-- Botão Salvar -->
     <Button
