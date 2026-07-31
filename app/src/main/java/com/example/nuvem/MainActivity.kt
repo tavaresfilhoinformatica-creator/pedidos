@@ -1,6 +1,7 @@
 package com.example.nuvem
 
 import android.content.Intent
+import android.graphics.Paint
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
@@ -18,6 +19,7 @@ class MainActivity : AppCompatActivity() {
 
 
     }
+
     fun encerrar_aplicativo(view : View) {
         val txtSair = findViewById<TextView>(R.id.txtSair)
        txtSair.setOnClickListener { finishAffinity() }

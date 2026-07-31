@@ -9,7 +9,7 @@ interface ApiService {
 
     // Carrega a lista de grupos
     @GET("grupos")
-    suspend fun obterGrupos(): List<Grupo>
+    suspend fun atualizarTabelaRemota(): List<Grupo>
 
     // Carrega a lista de produtos (já com as URLs do Supabase em web_imagem)
     @GET("produtos")

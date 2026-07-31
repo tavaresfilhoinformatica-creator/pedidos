@@ -15,7 +15,7 @@
         android:id="@+id/imageView2"
         android:layout_width="match_parent"
         android:layout_height="200dp"
-        app:srcCompat="@drawable/garcon" />
+        app:srcCompat="@drawable/mensagem" />
 
     <!-- RadioGroup agrupando corretamente os botões de opção -->
     <RadioGroup
@@ -64,31 +64,35 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="16dp"
-        android:background="#EFE9E9"
-        android:backgroundTint="#180101"
+        android:background="#E7E0E0"
+        android:backgroundTint="#EDE9E9"
         android:padding="8dp" />
 
-    <Button
+    <TextView
         android:id="@+id/btnPesquisar"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:backgroundTint="#0AA810"
+        android:layout_gravity="center"
         android:onClick="pesquisar"
-        android:text="Pesquisar"
+        android:text="@string/pesquisar"
         android:textColor="#F0EEEE"
-        android:textSize="18sp"
+        android:fontFamily="cursive"
+        android:textSize="30sp"
         android:textStyle="bold" />
 
-    <Button
+    <TextView
         android:id="@+id/btnInicio"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="15dp"
+        android:layout_gravity="center"
         android:backgroundTint="#4D4949"
         android:onClick="telaInicial"
-        android:text="Voltar"
+        android:text="@string/inicio"
         android:textColor="#EDE3E3"
-        android:textSize="18sp"
+        android:fontFamily="cursive"
+        android:textSize="30sp"
         android:textStyle="bold" />
 
 </LinearLayout>

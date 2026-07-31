@@ -10,6 +10,7 @@ import android.widget.EditText
 import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.Spinner
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -66,7 +67,7 @@ class telaPesquisa : AppCompatActivity() {
         // 2. Busca os dados no servidor (Aiven via Retrofit) e salva no Room
         lifecycleScope.launch {
             try {
-                val gruposDaNuvem = RetrofitClient.apiService.obterGrupos()
+                val gruposDaNuvem = RetrofitClient.apiService.atualizarTabelaRemota()
                 grupoDao.inserirGrupo(gruposDaNuvem)
             } catch (e: Exception) {
                 Log.e("TESTE_ROOM", "Erro ao carregar dados da nuvem: ${e.message}")
@@ -75,11 +76,12 @@ class telaPesquisa : AppCompatActivity() {
 
         val radioGroup = findViewById<RadioGroup>(R.id.radioOpcoes)
         val opcaoTitulo = findViewById<RadioButton>(R.id.tituloOpcao)
-        val btnPesquisar = findViewById<Button>(R.id.btnPesquisar)
+        val btnPesquisar = findViewById<TextView>(R.id.btnPesquisar)
         val textoBusca = findViewById<EditText>(R.id.pesqEdit)
-
-        // Define o foco inicial
         opcaoTitulo.requestFocus()
+
+
+
 
         // 3. Ação do botão Pesquisar
         btnPesquisar.setOnClickListener {

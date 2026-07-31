@@ -16,7 +16,7 @@ class AppRepository(
     // --- GRUPOS ---
     suspend fun sincronizarGrupos(): Result<Unit> {
         return try {
-            val gruposWeb = apiService.obterGrupos()
+            val gruposWeb = apiService.atualizarTabelaRemota()
             grupoDao.inserirGrupo(gruposWeb) // Chama a função de inserção
             Result.success(Unit)
         } catch (e: Exception) {

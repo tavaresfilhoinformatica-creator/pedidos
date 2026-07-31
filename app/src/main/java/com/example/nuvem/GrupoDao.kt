@@ -6,6 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.PrimaryKey
 import androidx.room.Query
+import androidx.room.Transaction
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -14,4 +15,13 @@ interface GrupoDao {
     fun buscarGrupo(): Flow<List<Grupo>>
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun inserirGrupo(grupo: List<Grupo>)
+
+    @Query("DELETE FROM grupo")
+    suspend fun deletarTodos()
+
+    @Transaction
+    suspend fun atualizarTabelaRemota(gruposRemotos: List<Grupo>) {
+        deletarTodos()
+        inserirGrupo(gruposRemotos)
+    }
 }

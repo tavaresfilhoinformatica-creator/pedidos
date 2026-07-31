@@ -17,7 +17,7 @@ import java.math.BigDecimal
     primaryKeys = ["pedido", "produto"]
 )
 data class ItemPedido(
-    val pedido: String,
+    val pedido: Int,
     val produto: String,
     val quantidade: Int,
     val preco_venda: BigDecimal,

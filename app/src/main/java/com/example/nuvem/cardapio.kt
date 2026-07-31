@@ -67,8 +67,10 @@ class cardapio : AppCompatActivity() {
                 }
                 "GRUPO" -> {
                     val textoLimpo = valorBusca?.trim()
+
                     if (!textoLimpo.isNullOrEmpty()) {
                         // Passa a String limpa diretamente para o DAO
+                        Log.d("GRUPO_PARA_COMPARAR", "Grupo para comparação: ${textoLimpo}")
                         produtoDao.buscarPorGrupo(textoLimpo)
                     } else {
                         produtoDao.obterTodos()

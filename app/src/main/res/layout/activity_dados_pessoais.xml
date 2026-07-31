@@ -20,9 +20,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="24dp"
-        android:text="Meus Dados"
+        android:fontFamily="cursive"
+        android:text="@string/meusdados"
         android:textColor="#E6DDDD"
-        android:textSize="22sp"
+        android:textSize="25sp"
         android:textStyle="bold" />
 
     <!-- Campo Nome -->
@@ -56,6 +57,7 @@
         android:layout_marginBottom="12dp"
         android:hint="Telefone"
         android:inputType="phone"
+        android:maxLength="11"
         android:textColor="#E6DCDC"
         android:textColorHint="#E6DFDF" />
 
@@ -118,41 +120,47 @@
         android:textColorHint="#F0E9E9" />
 
     <!-- Botão Salvar -->
-    <Button
+    <TextView
         android:id="@+id/btnSalvar"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:backgroundTint="#044907"
+        android:layout_gravity="center"
+        android:fontFamily="cursive"
         android:onClick="salvarDados"
-        android:text="Salvar Dados"
+        android:text="@string/salvar"
         android:textColor="#E7EDE6E6"
-        android:textSize="20sp"
+        android:textSize="30sp"
         android:textStyle="bold" />
 
     <!-- Botão Meus Pedidos -->
-    <Button
+    <TextView
         android:id="@+id/btnMeusPedidos"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
+        android:layout_gravity="center"
+        android:layout_marginBottom="12dp"
         android:backgroundTint="#1976D2"
-        android:text="Meus Pedidos"
+        android:fontFamily="cursive"
+        android:text="@string/meuspedidos"
         android:textColor="#E9FFFFFF"
-        android:textSize="20sp"
+        android:textSize="30sp"
         android:textStyle="bold" />
 
     <!-- Botão Voltar -->
-    <Button
+    <TextView
         android:id="@+id/btnVoltar"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
+        android:layout_gravity="center"
+        android:layout_marginBottom="20dp"
         android:backgroundTint="#757575"
+        android:fontFamily="cursive"
         android:onClick="telaInicial"
-        android:text="Voltar"
+        android:text="@string/voltar"
         android:textColor="#E4FFFFFF"
-        android:textSize="20sp"
+        android:textSize="30sp"
         android:textStyle="bold" />
 
   </LinearLayout>

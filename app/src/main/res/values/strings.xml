@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">Nuvem</string>
+    <string name="cardapio"><u>Produtos</u></string>
+    <string name="meusdados"><u>Meus Dados</u></string>
+    <string name="sair"><u>Sair</u></string>
+    <string name="salvar"><u>Salvar Dados</u></string>
+    <string name="meuspedidos"><u>Meus Pedidos</u></string>
+    <string name="voltar"><u>Voltar</u></string>
+    <string name="pesquisar"><u>Pesquisar</u></string>
+    <string name="inicio"><u>Inicio</u></string>
 </resources>

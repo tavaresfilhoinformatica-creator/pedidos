@@ -1,6 +1,6 @@
 @echo off
 echo Salvando e enviando alteracoes para o GitHub...
-
+cd c:\tico\amdroid\nuvem
 :: 1. Prepara todos os arquivos alterados
 git add .
 
