@@ -31,6 +31,7 @@
             android:id="@+id/tituloOpcao"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:checked="true"
             android:text="Por Título"
             android:textColor="#EFEBEB"
             android:textSize="16sp"
@@ -52,9 +53,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ems="10"
-        android:hint="Digite aqui, em branco para todos"
+        android:hint="Pesquise aqui, em branco para todos"
         android:inputType="text"
         android:textColor="#EFEAEA"
+        android:visibility="visible"
         android:textColorHint="#F2EBEB" />
 
     <!-- Spinner posicionado após a caixa de texto e antes dos botões -->
@@ -62,6 +64,7 @@
         android:id="@+id/spinnerGrupos"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:visibility="gone"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="16dp"
         android:background="#E7E0E0"
@@ -78,8 +81,8 @@
         android:text="@string/pesquisar"
         android:textColor="#F0EEEE"
         android:fontFamily="cursive"
-        android:textSize="30sp"
-        android:textStyle="bold" />
+        android:textSize="30sp"/>
+
 
     <TextView
         android:id="@+id/btnInicio"
@@ -92,7 +95,7 @@
         android:text="@string/inicio"
         android:textColor="#EDE3E3"
         android:fontFamily="cursive"
-        android:textSize="30sp"
-        android:textStyle="bold" />
+        android:textSize="30sp"/>
+
 
 </LinearLayout>

@@ -52,7 +52,7 @@ class telaPesquisa : AppCompatActivity() {
         // 1. Observa o Flow do Room em tempo real e atualiza a lista do Adapter existente
         lifecycleScope.launch {
             grupoDao.buscarGrupo().collect { listaGrupos ->
-                Log.d("TESTE_ROOM", "Quantidade de grupos no Room: ${listaGrupos.size}")
+                Log.d("TESTE_ROOM", "QuantidadeActivity de grupos no Room: ${listaGrupos.size}")
 
                 adapter.clear()
                 if (listaGrupos.isEmpty()) {
@@ -78,10 +78,19 @@ class telaPesquisa : AppCompatActivity() {
         val opcaoTitulo = findViewById<RadioButton>(R.id.tituloOpcao)
         val btnPesquisar = findViewById<TextView>(R.id.btnPesquisar)
         val textoBusca = findViewById<EditText>(R.id.pesqEdit)
-        opcaoTitulo.requestFocus()
-
-
-
+        val opcaogrupo=findViewById<Spinner>(R.id.spinnerGrupos)
+        radioGroup.setOnCheckedChangeListener { _, checkedId ->
+            when (checkedId) {
+                R.id.tituloOpcao -> {
+                    textoBusca.visibility = View.VISIBLE
+                    opcaogrupo.visibility = View.GONE
+                }
+                R.id.grupoOpcao -> {
+                    textoBusca.visibility = View.GONE
+                    opcaogrupo.visibility = View.VISIBLE
+                }
+            }
+        }
 
         // 3. Ação do botão Pesquisar
         btnPesquisar.setOnClickListener {
