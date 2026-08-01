@@ -12,21 +12,19 @@
         android:id="@+id/txtNomeProduto"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Nome do Produto"
-        android:textSize="22sp"
-        android:textStyle="bold"
         android:layout_marginTop="32dp"
-        android:gravity="center" />
+        android:gravity="center"
+        android:textSize="22sp"
+        android:textStyle="bold" />
 
     <!-- Preço Unitário -->
     <TextView
         android:id="@+id/txtPrecoProduto"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="R$ 0,00"
-        android:textSize="18sp"
+        android:layout_marginTop="8dp"
         android:textColor="#666666"
-        android:layout_marginTop="8dp" />
+        android:textSize="18sp" />
 
     <!-- Seletor de Quantidade (- 1 +) -->
     <LinearLayout
@@ -40,7 +38,7 @@
             android:id="@+id/btnMenos"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:text="-"
+            android:backgroundTint="#ED0D0D"
             android:textSize="20sp" />
 
         <TextView
@@ -57,7 +55,7 @@
             android:id="@+id/btnMais"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:text="+"
+            android:backgroundTint="#0FD517"
             android:textSize="20sp" />
     </LinearLayout>
 

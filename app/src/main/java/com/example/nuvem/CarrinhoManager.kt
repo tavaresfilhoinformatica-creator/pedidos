@@ -1,6 +1,6 @@
 package com.example.nuvem
 
-import android.icu.math.BigDecimal
+import java.math.BigDecimal
 
 object CarrinhoManager {
     val itens = mutableListOf<ItemCarrinho>()

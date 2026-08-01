@@ -1,5 +1,6 @@
 package com.example.nuvem
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.enableEdgeToEdge
@@ -25,6 +26,16 @@ class cardapio : AppCompatActivity() {
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
+        }
+
+        // Configura a ação de clique nos cards de produtos
+        produtoAdapter.onItemClick = { produto ->
+            val intent = Intent(this, QuantidadeActivity::class.java).apply {
+                putExtra("PRODUTO_ID", produto.codigo) // Já é String, não precisa de toString()
+                putExtra("PRODUTO_NOME", produto.descricao) // Já é String
+                putExtra("PRODUTO_PRECO", produto.venda.toString()) // Converte BigDecimal para String
+            }
+            startActivity(intent)
         }
 
         val recyclerView = findViewById<RecyclerView>(R.id.recyclerViewProdutos)

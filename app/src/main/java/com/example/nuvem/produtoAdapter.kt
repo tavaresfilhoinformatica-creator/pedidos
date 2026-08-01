@@ -15,9 +15,12 @@ import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
-import com.bumptech.glide.request.target.Target // 👈 IMPORT QUE FALTAVA
+import com.bumptech.glide.request.target.Target
 
 class ProdutoAdapter : ListAdapter<Produto, ProdutoAdapter.ProdutoViewHolder>(DiffCallback) {
+
+    // 1. DECLARAÇÃO DO CALLBACK DE CLIQUE
+    var onItemClick: ((Produto) -> Unit)? = null
 
     class ProdutoViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val txtNome: TextView = view.findViewById(R.id.txtNomeProduto)
@@ -25,18 +28,23 @@ class ProdutoAdapter : ListAdapter<Produto, ProdutoAdapter.ProdutoViewHolder>(Di
         val imgView: ImageView = view.findViewById(R.id.imgProduto)
         val txtObs: TextView = view.findViewById(R.id.txtObsProduto)
 
-        fun bind(produto: Produto) {
+        fun bind(produto: Produto, onItemClick: ((Produto) -> Unit)?) {
             txtNome.text = produto.descricao
             txtPreco.text = String.format("R$ %.2f", produto.venda)
             txtObs.text = produto.obs
 
-            // Carregamento direto otimizado para Android 16
+            // Carregamento de imagem com Glide
             Glide.with(itemView.context)
                 .load(produto.imagem_web)
-                .diskCacheStrategy(DiskCacheStrategy.ALL) // Garante o cache correto da imagem
-                .placeholder(android.R.drawable.ic_menu_gallery) // Mostra mentras carrega
-                .error(android.R.drawable.ic_delete)             // Mostra se a URL/Rede falhar
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .placeholder(android.R.drawable.ic_menu_gallery)
+                .error(android.R.drawable.ic_delete)
                 .into(imgView)
+
+            // 2. DISPARO DO CLIQUE AO TOCAR NO ITEM
+            itemView.setOnClickListener {
+                onItemClick?.invoke(produto)
+            }
         }
     }
 
@@ -47,7 +55,8 @@ class ProdutoAdapter : ListAdapter<Produto, ProdutoAdapter.ProdutoViewHolder>(Di
     }
 
     override fun onBindViewHolder(holder: ProdutoViewHolder, position: Int) {
-        holder.bind(getItem(position))
+        // Passa o onItemClick para a função bind do ViewHolder
+        holder.bind(getItem(position), onItemClick)
     }
 
     companion object DiffCallback : DiffUtil.ItemCallback<Produto>() {

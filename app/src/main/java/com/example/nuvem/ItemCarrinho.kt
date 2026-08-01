@@ -1,6 +1,7 @@
 package com.example.nuvem
 
-import android.icu.math.BigDecimal
+
+import java.math.BigDecimal
 
 data class ItemCarrinho(
     val produtoId: String,
