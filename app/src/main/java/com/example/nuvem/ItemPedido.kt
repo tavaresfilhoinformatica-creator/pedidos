@@ -6,17 +6,19 @@ import java.math.BigDecimal
 
 @Entity(
     tableName = "itempedido",
-    // Declarando a relação com a tabela pedido
+    // Declarando a relação com a tabela Pedido (agora com chave composta)
     foreignKeys = [
         ForeignKey(
-            entity = Pedido::class,        // A classe da tabela Pai
-            parentColumns = ["numero"],    // O campo chave na tabela Pedido
-            childColumns = ["pedido"]      // O campo que faz o vínculo aqui na tabela ItemPedido
+            entity = Pedido::class,
+            parentColumns = ["cpf", "numero"],  // As 2 colunas da chave primária da tabela Pedido
+            childColumns = ["cpf", "pedido"],   // As 2 colunas de vínculo aqui no ItemPedido
+            onDelete = ForeignKey.CASCADE       // Opcional: exclui os itens se o pedido for excluído
         )
-    ], // <-- Essa vírgula aqui é obrigatória para separar os parâmetros
-    primaryKeys = ["pedido", "produto"]
+    ],
+    primaryKeys = ["cpf", "pedido", "produto"]
 )
 data class ItemPedido(
+    val cpf: String,
     val pedido: Int,
     val produto: String,
     val quantidade: Int,

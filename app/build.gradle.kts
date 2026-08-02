@@ -40,6 +40,7 @@ android {
 dependencies {
     implementation(libs.androidx.activity.ktx)
     implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.camera.camera2.pipe)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.constraintlayout.v214)
 

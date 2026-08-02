@@ -52,12 +52,15 @@
         android:id="@+id/pesqEdit"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:backgroundTint="#EDE6E6"
+        android:backgroundTintMode="src_over"
+        android:breakStrategy="high_quality"
         android:ems="10"
         android:hint="Pesquise aqui, em branco para todos"
         android:inputType="text"
         android:textColor="#EFEAEA"
-        android:visibility="visible"
-        android:textColorHint="#F2EBEB" />
+        android:textColorHint="#F2EBEB"
+        android:visibility="visible" />
 
     <!-- Spinner posicionado após a caixa de texto e antes dos botões -->
     <Spinner

@@ -1,8 +1,5 @@
 package com.example.nuvem
 
-import android.util.Log
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
 import kotlinx.coroutines.flow.Flow
 
 class AppRepository(
@@ -10,7 +7,7 @@ class AppRepository(
     private val grupoDao: GrupoDao,
     private val produtoDao: ProdutoDao,
     private val pagamentoDao: PagamentoDao,
-    private val pedidoDao: PedidoDao
+    private val pedidoDao: pedidoDao
 ) {
 
     // --- GRUPOS ---
@@ -36,7 +33,7 @@ class AppRepository(
     // --- PAGAMENTOS ---
     suspend fun sincronizarPagamentos(): Result<Unit> {
         return try {
-            val pagamentosWeb = apiService.obterFormasPagamento()
+            val pagamentosWeb = apiService.obterTodas()
             pagamentoDao.inserirPagamentos(pagamentosWeb)
             Result.success(Unit)
         } catch (e: Exception) {

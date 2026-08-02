@@ -16,7 +16,7 @@ import androidx.room.TypeConverters
         Pagamento:: class,
         DadosPessoais:: class
     ],
-    version = 2,
+    version = 3,
     exportSchema = false // Evita avisos de exportação de schema durante o build
 )
 // 2. Registro do nosso conversor para BigDecimal e Datas funcionar em todo o app
@@ -27,11 +27,13 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun DadosPessoaisDao() : DadosPessoaisDao
     abstract fun GrupoDao() : GrupoDao
     abstract fun produtoDao(): ProdutoDao
+    abstract fun PagamentoDao(): PagamentoDao
+    abstract fun pedidoDao(): pedidoDao
 
     // Conforme você for criando os outros DAOs futuramente,
     // basta vir aqui e declarar as funções deles, por exemplo:
     // abstract fun itemPedidoDao(): ItemPedidoDao
-    // abstract fun pedidoDao(): PedidoDao
+    // abstract fun pedidoDao(): pedidoDao
 
     companion object {
         @Volatile

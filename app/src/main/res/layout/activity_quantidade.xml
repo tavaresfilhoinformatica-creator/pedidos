@@ -3,9 +3,11 @@
     style="@style/Widget.MaterialComponents.Button.OutlinedButton"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#1B0101"
+    android:backgroundTint="#1A0101"
+    android:gravity="center_horizontal"
     android:orientation="vertical"
-    android:padding="24dp"
-    android:gravity="center_horizontal">
+    android:padding="24dp">
 
     <!-- Nome do Produto Selecionado -->
     <TextView
@@ -14,6 +16,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
         android:gravity="center"
+        android:textColorLink="#F0E3E3"
         android:textSize="22sp"
         android:textStyle="bold" />
 
@@ -30,9 +33,9 @@
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
+        android:layout_marginTop="48dp"
         android:gravity="center_vertical"
-        android:layout_marginTop="48dp">
+        android:orientation="horizontal">
 
         <Button
             android:id="@+id/btnMenos"
@@ -45,11 +48,11 @@
             android:id="@+id/txtQuantidade"
             android:layout_width="60dp"
             android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:gravity="center"
             android:text="1"
             android:textSize="24sp"
-            android:textStyle="bold"
-            android:gravity="center"
-            android:layout_marginHorizontal="16dp" />
+            android:textStyle="bold" />
 
         <Button
             android:id="@+id/btnMais"
@@ -68,17 +71,21 @@
     <!-- Botão: Continuar Selecionando -->
     <Button
         android:id="@+id/btnContinuarSelecionando"
+        style="?attr/materialButtonOutlinedStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Continuar Selecionando"
-        style="?attr/materialButtonOutlinedStyle"
-        android:layout_marginBottom="12dp" />
+        android:layout_marginBottom="12dp"
+        android:text="Confirmar Item"
+        android:textColor="#EDE4E4"
+        android:textStyle="bold" />
 
     <!-- Botão: Finalizar Pedido -->
     <Button
         android:id="@+id/btnFinalizarPedido"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Finalizar Pedido" />
+        android:backgroundTint="#120101"
+        android:text="Finalizar Pedido"
+        android:textColorLink="#E9D7D7" />
 
 </LinearLayout>

@@ -17,7 +17,8 @@ interface ApiService {
 
     // Carrega as formas de pagamento
     @GET("pagamentos")
-    suspend fun obterFormasPagamento(): List<Pagamento>
+   // suspend fun obterFormasPagamento(): List<Pagamento>
+    suspend fun obterTodas(): List<Pagamento>
 
     // Envia o pedido feito pelo cliente no app de volta para a nuvem
     @POST("pedidos")
