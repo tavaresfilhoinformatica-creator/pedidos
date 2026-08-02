@@ -1,6 +1,5 @@
 @echo off
 echo Salvando e enviando alteracoes para o GitHub...
-cd c:\tico\amdroid\nuvem
 :: 1. Prepara todos os arquivos alterados
 git add .
 
@@ -16,3 +15,4 @@ git push origin main
 echo.
 echo Alteracoes enviadas com sucesso!
 pause
+exit

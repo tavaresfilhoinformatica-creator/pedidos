@@ -36,6 +36,7 @@ class CheckoutActivity : AppCompatActivity() {
 
         // Referências da Interface
         val rvItens = findViewById<RecyclerView>(R.id.rvItensCheckout)
+        rvItens.adapter = CarrinhoCheckoutAdapter(CarrinhoManager.itens)
         txtTotalCheckout = findViewById(R.id.txtTotalCheckout)
         edtEndereco = findViewById(R.id.edtEndereco)
         edtBairro = findViewById(R.id.edtBairro)
