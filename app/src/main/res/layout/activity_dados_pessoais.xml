@@ -143,6 +143,7 @@
         android:layout_marginBottom="12dp"
         android:backgroundTint="#1976D2"
         android:fontFamily="cursive"
+        android:onClick="meusPedidos"
         android:text="@string/meuspedidos"
         android:textColor="#E9FFFFFF"
         android:textSize="30sp"

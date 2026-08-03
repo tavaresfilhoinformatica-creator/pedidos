@@ -21,6 +21,7 @@ data class ItemPedido(
     val cpf: String,
     val pedido: Int,
     val produto: String,
+    val descricao: String? = null,
     val quantidade: Int,
     val preco_venda: BigDecimal,
     val total_item: BigDecimal

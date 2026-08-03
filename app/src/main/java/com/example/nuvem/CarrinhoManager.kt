@@ -5,12 +5,14 @@ import java.math.BigDecimal
 object CarrinhoManager {
     val itens = mutableListOf<ItemCarrinho>()
 
-    fun adicionarOuAtualizar(item: ItemCarrinho) {
-        val existente = itens.find { it.produtoId == item.produtoId }
-        if (existente != null) {
-            existente.quantidade += item.quantidade
+    fun adicionarOuAtualizar(novoItem: ItemCarrinho) {
+        val index = itens.indexOfFirst { it.produtoId == novoItem.produtoId }
+        if (index != -1) {
+            // SUBSTITUI o item antigo pelo novo com a quantidade exata escolhida
+            itens[index] = novoItem
         } else {
-            itens.add(item)
+            // Se não existia, adiciona na lista
+            itens.add(novoItem)
         }
     }
 
@@ -20,5 +22,8 @@ object CarrinhoManager {
 
     fun limpar() {
         itens.clear()
+    }
+    fun removerItem(produtoId: String) {
+        itens.removeAll { it.produtoId == produtoId }
     }
 }

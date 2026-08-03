@@ -109,4 +109,8 @@ class activity_dados_pessoais : AppCompatActivity() {
         val intent = Intent(this, MainActivity::class.java)
         startActivity(intent)
     }
+    fun meusPedidos(view: View){
+        val intent = Intent(this, activity_historico_pedidos::class.java)
+        startActivity(intent)
+    }
 }

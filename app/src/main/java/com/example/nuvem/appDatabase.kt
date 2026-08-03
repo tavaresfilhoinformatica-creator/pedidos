@@ -16,7 +16,7 @@ import androidx.room.TypeConverters
         Pagamento:: class,
         DadosPessoais:: class
     ],
-    version = 3,
+    version = 4,
     exportSchema = false // Evita avisos de exportação de schema durante o build
 )
 // 2. Registro do nosso conversor para BigDecimal e Datas funcionar em todo o app
