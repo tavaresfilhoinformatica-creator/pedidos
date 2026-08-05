@@ -2,8 +2,10 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="#5F7DF6"
     android:orientation="horizontal"
-    android:padding="8dp">
+    android:padding="8dp"
+    android:textColor="@color/black">
 
     <TextView
         android:id="@+id/txtNomeProduto"
@@ -11,23 +13,24 @@
         android:layout_height="wrap_content"
         android:layout_weight="2"
         android:text="Nome do Produto"
-        android:textStyle="bold"
-        android:textColor="@android:color/black" />
+        android:textColor="@color/white"
+        android:textStyle="bold" />
 
     <TextView
         android:id="@+id/txtQtdPreco"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
+        android:gravity="center"
         android:text="1x R$ 0,00"
-        android:gravity="center" />
+        android:textColor="#EDE6E6" />
 
     <TextView
         android:id="@+id/txtTotalItem"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="R$ 0,00"
-        android:textStyle="bold"
-        android:textColor="#2E7D32" />
+        android:textColor="#F40B0B"
+        android:textStyle="bold" />
 
 </LinearLayout>

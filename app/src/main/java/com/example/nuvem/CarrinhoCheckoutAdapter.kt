@@ -13,6 +13,7 @@ class CarrinhoCheckoutAdapter(
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val txtNome: TextView = view.findViewById(R.id.txtNomeProduto)
+
         val txtQtdPreco: TextView = view.findViewById(R.id.txtQtdPreco)
         val txtTotalItem: TextView = view.findViewById(R.id.txtTotalItem)
     }

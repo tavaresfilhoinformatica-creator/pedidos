@@ -5,8 +5,8 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#180202"
-    android:backgroundTint="#1F0202"
+    android:background="#5F7DF6"
+    android:backgroundTint="#5F7DF6"
     android:orientation="vertical"
     android:padding="16dp"
     tools:context=".telaPesquisa">
@@ -67,38 +67,38 @@
         android:id="@+id/spinnerGrupos"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:visibility="gone"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="16dp"
-        android:background="#E7E0E0"
-        android:backgroundTint="#EDE9E9"
-        android:padding="8dp" />
+        android:background="#5F7DF6"
+        android:backgroundTint="#180202"
+        android:padding="8dp"
+        android:visibility="gone" />
 
     <TextView
         android:id="@+id/btnPesquisar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:backgroundTint="#0AA810"
         android:layout_gravity="center"
+        android:backgroundTint="#0AA810"
+        android:fontFamily="cursive"
         android:onClick="pesquisar"
         android:text="@string/pesquisar"
         android:textColor="#F0EEEE"
-        android:fontFamily="cursive"
-        android:textSize="30sp"/>
+        android:textSize="25sp" />
 
 
     <TextView
         android:id="@+id/btnInicio"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="15dp"
         android:layout_gravity="center"
+        android:layout_marginTop="15dp"
         android:backgroundTint="#4D4949"
+        android:fontFamily="cursive"
         android:onClick="telaInicial"
         android:text="@string/inicio"
         android:textColor="#EDE3E3"
-        android:fontFamily="cursive"
-        android:textSize="30sp"/>
+        android:textSize="25sp" />
 
 
 </LinearLayout>

@@ -3,35 +3,36 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#4D6DE2"
     android:orientation="vertical"
-    android:padding="16dp"
-    android:background="#1B0101">
+    android:padding="16dp">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
         android:text="Histórico de Pedidos"
-        android:textSize="22sp"
-        android:textStyle="bold"
         android:textColor="#FFFFFF"
-        android:layout_marginBottom="16dp" />
+        android:textSize="22sp"
+        android:textStyle="bold" />
 
     <!-- Mensagem de aviso caso não existam pedidos -->
     <TextView
         android:id="@+id/txtSemPedidos"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:gravity="center"
         android:text="Nenhum pedido encontrado."
         android:textColor="#CCCCCC"
-        android:gravity="center"
         android:textSize="16sp"
-        android:visibility="gone"
-        android:layout_marginTop="32dp" />
+        android:visibility="gone" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvHistoricoPedidos"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="#5F7DF6"
         tools:listitem="@layout/item_historico_pedido" />
 
 </LinearLayout>

@@ -42,7 +42,6 @@
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:backgroundTint="#ED0D0D"
-            android:text="-"
             android:textColor="#FFFFFF"
             android:textSize="20sp" />
 
@@ -62,7 +61,6 @@
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:backgroundTint="#0FD517"
-            android:text="+"
             android:textColor="#FFFFFF"
             android:textSize="20sp" />
     </LinearLayout>

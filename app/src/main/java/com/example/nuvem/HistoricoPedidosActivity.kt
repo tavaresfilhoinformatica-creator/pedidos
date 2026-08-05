@@ -83,7 +83,7 @@ class HistoricoPedidosActivity : AppCompatActivity() {
 
                 for (item in itens) {
                     val tvItem = TextView(this@HistoricoPedidosActivity).apply {
-                        text = "${item.quantidade}x ${item.produto} - R$ %.2f (Total: R$ %.2f)"
+                        text = "${item.quantidade}x ${item.descricao} - R$ %.2f (Total: R$ %.2f)"
                             .format(item.preco_venda, item.total_item)
                         setTextColor(android.graphics.Color.WHITE)
                         textSize = 15f
