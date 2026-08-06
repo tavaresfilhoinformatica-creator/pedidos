@@ -128,7 +128,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:layout_marginBottom="20dp"
+            android:layout_marginBottom="12dp"
             android:hint="Telefone de Contato"
             app:hintTextColor="@android:color/white"
             android:textColorHint="#D1D1D1">
@@ -138,6 +138,25 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="phone"
+                android:textColor="@android:color/white"
+                android:textColorHint="#D1D1D1" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- OBSERVAÇÕES -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:hint="Observações (opcional)"
+            app:hintTextColor="@android:color/white"
+            android:textColorHint="#D1D1D1">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edtObs"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textMultiLine"
+                android:minLines="2"
                 android:textColor="@android:color/white"
                 android:textColorHint="#D1D1D1" />
         </com.google.android.material.textfield.TextInputLayout>

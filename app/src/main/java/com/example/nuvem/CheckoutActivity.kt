@@ -27,6 +27,7 @@ class CheckoutActivity : AppCompatActivity() {
     private lateinit var edtBairro: EditText
     private lateinit var edtCep: EditText
     private lateinit var edtTelefone: EditText
+    private lateinit var edtObs: EditText
     private lateinit var spinnerPagamento: Spinner
     private lateinit var txtTotalCheckout: TextView
 
@@ -44,6 +45,7 @@ class CheckoutActivity : AppCompatActivity() {
         edtBairro = findViewById(R.id.edtBairro)
         edtCep = findViewById(R.id.edtCep)
         edtTelefone = findViewById(R.id.edtTelefone)
+        edtObs = findViewById(R.id.edtObs)
         spinnerPagamento = findViewById(R.id.spinnerPagamento)
         val btnEnviarPedido = findViewById<Button>(R.id.btnEnviarPedido)
         val btnContinuarComprando = findViewById<Button>(R.id.btnContinuarComprando)
@@ -157,10 +159,20 @@ class CheckoutActivity : AppCompatActivity() {
         val bairro = edtBairro.text.toString().trim()
         val cep = edtCep.text.toString().trim()
         val telefone = edtTelefone.text.toString().trim()
+        val observacaoDigitada = edtObs.text.toString().trim()
 
         if (endereco.isEmpty() || telefone.isEmpty()) {
             Toast.makeText(this, "Preencha o endereço e telefone para entrega.", Toast.LENGTH_SHORT).show()
             return
+        }
+
+        val formaPagamento = spinnerPagamento.selectedItem ?: "Não informado"
+
+        // Monta a string de observação (ou salva só o texto da obs se não quiser concatenar o pagamento)
+        val obsFinal = if (observacaoDigitada.isNotEmpty()) {
+            "$observacaoDigitada | Pagamento: $formaPagamento"
+        } else {
+            "Pagamento: $formaPagamento"
         }
 
         val db = AppDatabase.getDatabase(this)
@@ -172,7 +184,7 @@ class CheckoutActivity : AppCompatActivity() {
 
             val totalPedido = CarrinhoManager.calcularTotal()
 
-            // 2. Instancia a Entity Pedido
+            // 2. Instancia a Entity Pedido gravando a Observação
             val pedido = Pedido(
                 cpf = cpfCliente,
                 numero = novoNumeroPedido,
@@ -181,7 +193,7 @@ class CheckoutActivity : AppCompatActivity() {
                 bairro_entrega = bairro,
                 cep_entrega = cep,
                 telefone_entrega = telefone,
-                obs = "Pagamento: ${spinnerPagamento.selectedItem ?: "Não informado"}"
+                obs = obsFinal
             )
 
             // 3. Mapeia os itens do carrinho para ItemPedido
