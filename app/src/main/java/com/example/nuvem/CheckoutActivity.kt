@@ -1,8 +1,11 @@
 package com.example.nuvem
 
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
+import android.view.View
+import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
@@ -14,7 +17,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.Dispatchers
-
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.math.BigDecimal
@@ -47,8 +49,7 @@ class CheckoutActivity : AppCompatActivity() {
         val btnContinuarComprando = findViewById<Button>(R.id.btnContinuarComprando)
 
         // Configuração da Lista do Carrinho
-        // Nota: Certifique-se de ter um Adapter simples para a lista do checkout se quiser exibir visualmente
-         rvItens.layoutManager = LinearLayoutManager(this)
+        rvItens.layoutManager = LinearLayoutManager(this)
 
         atualizarTotal()
 
@@ -76,7 +77,7 @@ class CheckoutActivity : AppCompatActivity() {
         val db = AppDatabase.getDatabase(this)
         lifecycleScope.launch(Dispatchers.IO) {
             // Busca o primeiro registro de dados pessoais salvo no Room
-            val dados = db.DadosPessoaisDao().obterDadosPessoais() // Ajuste o nome do seu DAO/Método
+            val dados = db.DadosPessoaisDao().obterDadosPessoais()
             withContext(Dispatchers.Main) {
                 dados?.let {
                     cpfCliente = it.cpf
@@ -114,11 +115,24 @@ class CheckoutActivity : AppCompatActivity() {
 
             withContext(Dispatchers.Main) {
                 if (nomesFormas.isNotEmpty()) {
-                    val adapter = ArrayAdapter(
+                    // Customização do Adapter para renderizar o texto do Spinner na cor BRANCA
+                    val adapter = object : ArrayAdapter<String>(
                         this@CheckoutActivity,
                         android.R.layout.simple_spinner_item,
                         nomesFormas
-                    )
+                    ) {
+                        override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+                            val view = super.getView(position, convertView, parent) as TextView
+                            view.setTextColor(Color.WHITE)
+                            return view
+                        }
+
+                        override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup): View {
+                            val view = super.getDropDownView(position, convertView, parent) as TextView
+                            view.setTextColor(Color.WHITE)
+                            return view
+                        }
+                    }
                     adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                     spinnerPagamento.adapter = adapter
                 } else {
@@ -176,6 +190,7 @@ class CheckoutActivity : AppCompatActivity() {
                     cpf = cpfCliente,
                     pedido = novoNumeroPedido,
                     produto = item.produtoId,
+                    descricao = item.nomeProduto,
                     quantidade = item.quantidade,
                     preco_venda = item.precoUnitario,
                     total_item = item.totalItem

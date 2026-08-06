@@ -69,9 +69,10 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="16dp"
+        android:textColor="#F0EEEE"
         android:background="#5F7DF6"
-        android:backgroundTint="#180202"
-        android:padding="8dp"
+        android:popupBackground="#5F7DF6"
+         android:padding="8dp"
         android:visibility="gone" />
 
     <TextView
@@ -79,12 +80,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:backgroundTint="#0AA810"
-        android:fontFamily="cursive"
+        android:fontFamily="sans-serif-black"
         android:onClick="pesquisar"
         android:text="@string/pesquisar"
-        android:textColor="#F0EEEE"
-        android:textSize="25sp" />
+        android:textColor="#EEF0EE"
+        android:textSize="20sp" />
 
 
     <TextView
@@ -94,11 +94,11 @@
         android:layout_gravity="center"
         android:layout_marginTop="15dp"
         android:backgroundTint="#4D4949"
-        android:fontFamily="cursive"
+        android:fontFamily="sans-serif-black"
         android:onClick="telaInicial"
         android:text="@string/inicio"
         android:textColor="#EDE3E3"
-        android:textSize="25sp" />
+        android:textSize="20sp" />
 
 
 </LinearLayout>
