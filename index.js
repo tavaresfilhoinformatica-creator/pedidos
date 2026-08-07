@@ -51,7 +51,7 @@ app.get('/pagamentos', async (req, res) => {
   }
 });
 
-// 4. Salvar Pedido e Itens no Aiven (Corrigido)
+// 4. Salvar Pedido e Itens no Aiven (Estrutura Real do Banco)
 app.post('/pedidos', async (req, res) => {
   const client = await pool.connect();
   try {
@@ -71,7 +71,7 @@ app.post('/pedidos', async (req, res) => {
 
     await client.query('BEGIN');
 
-    // 1. Insere o cabeçalho do pedido (Garantindo o uso do campo 'numero')
+    // 1. Insere o cabeçalho do pedido (Retorna cpf e numero reais)
     const queryPedido = `
       INSERT INTO pedido (
         cpf, 
@@ -86,8 +86,9 @@ app.post('/pedidos', async (req, res) => {
         cep_entrega
       )
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
-      RETURNING id;
+      RETURNING cpf, numero;
     `;
+    
     const valoresPedido = [
       cpf, 
       numero, 
@@ -102,24 +103,23 @@ app.post('/pedidos', async (req, res) => {
     ];
 
     const resPedido = await client.query(queryPedido, valoresPedido);
-    const pedidoIdNuvem = resPedido.rows[0].id;
+    const pedidoCriado = resPedido.rows[0];
 
-    // 2. Insere os itens na tabela 'item_pedido'
+    // 2. Insere os itens na tabela 'item_pedido' usando as colunas reais do Aiven
     const queryItem = `
-      INSERT INTO item_pedido (cpf, pedido_id, produto_id, descricao, quantidade, preco_venda, total_item)
-      VALUES ($1, $2, $3, $4, $5, $6, $7);
+      INSERT INTO item_pedido (cpf, pedido, produto, quantidade, preco_venda, total_item)
+      VALUES ($1, $2, $3, $4, $5, $6);
     `;
 
     if (itens && Array.isArray(itens)) {
       for (const item of itens) {
         await client.query(queryItem, [
-          item.cpf,
-          pedidoIdNuvem, // Vincula a chave estrangeira gerada no Aiven
-          item.produtoId,
-          item.descricao,
+          item.cpf || cpf,
+          String(numero), 
+          item.produto || item.produtoId, 
           item.quantidade,
-          item.precoVenda,
-          item.totalItem
+          item.precoVenda || item.preco_venda,
+          item.totalItem || item.total_item
         ]);
       }
     }
@@ -129,7 +129,7 @@ app.post('/pedidos', async (req, res) => {
     res.status(201).json({ 
       sucesso: true, 
       mensagem: "Pedido e itens gravados no Aiven com sucesso!",
-      idPedidoNuvem: pedidoIdNuvem
+      numeroPedido: pedidoCriado.numero
     });
 
   } catch (err) {
@@ -138,7 +138,7 @@ app.post('/pedidos', async (req, res) => {
     res.status(500).json({ 
       sucesso: false, 
       mensagem: err.message,
-      idPedidoNuvem: null 
+      numeroPedido: null 
     });
   } finally {
     client.release();
