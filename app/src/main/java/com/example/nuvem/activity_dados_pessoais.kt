@@ -65,7 +65,6 @@ class activity_dados_pessoais : AppCompatActivity() {
                 val cepFormatado = s.toString().replace("-", "").replace(".", "").trim()
 
                 // Executa a busca assim que preencher os 8 números do CEP
-
                 if (cepFormatado.length == 8) {
                     consultarEAtualizarEnderecoPorCep(cepFormatado)
                 }
@@ -148,19 +147,34 @@ class activity_dados_pessoais : AppCompatActivity() {
                     val etMunicipio = findViewById<EditText>(R.id.etMunicipio)
                     val etEstado = findViewById<EditText>(R.id.etEstado)
 
-                    // 1. Atualiza os campos na tela
-                    etEndereco.setText(endereco.logradouro)
-                    etBairro.setText(endereco.bairro)
-                    etMunicipio.setText(endereco.localidade)
-                    etEstado.setText(endereco.uf)
+                    // SOLUÇÃO 1: Preenche os campos APENAS se estiverem em branco ou vazios
+                    if (etEndereco.text.isNullOrBlank()) {
+                        etEndereco.setText(endereco.logradouro)
+                    }
 
-                    Toast.makeText(this@activity_dados_pessoais, "Endereço encontrado!", Toast.LENGTH_SHORT).show()
+                    if (etBairro.text.isNullOrBlank()) {
+                        etBairro.setText(endereco.bairro)
+                    }
 
-                    // 2. Grava/Atualiza na tabela DadosPessoais do Room
+                    if (etMunicipio.text.isNullOrBlank()) {
+                        etMunicipio.setText(endereco.localidade)
+                    }
+
+                    if (etEstado.text.isNullOrBlank()) {
+                        etEstado.setText(endereco.uf)
+                    }
+
+                    Toast.makeText(this@activity_dados_pessoais, "CEP localizado!", Toast.LENGTH_SHORT).show()
+
+                    // Resgata o valor final do endereço exibido na tela para salvar no Room
+                    val enderecoFinal = etEndereco.text.toString()
+                    val bairroFinal = etBairro.text.toString()
+
+                    // 2. Grava/Atualiza na tabela DadosPessoais do Room preservando complementos manuais
                     salvarEnderecoNoRoom(
                         cep = cep,
-                        logradouro = endereco.logradouro,
-                        bairro = endereco.bairro
+                        logradouro = enderecoFinal,
+                        bairro = bairroFinal
                     )
                 } else {
                     Toast.makeText(this@activity_dados_pessoais, "CEP não encontrado.", Toast.LENGTH_SHORT).show()
