@@ -7,7 +7,10 @@
     android:background="#5F7DF6"
     android:fillViewport="true">
 
-  <LinearLayout
+ <LinearLayout
+
+
+
       android:layout_width="match_parent"
       android:layout_height="match_parent"
       android:descendantFocusability="afterDescendants"
@@ -118,32 +121,34 @@
         android:textColorHint="#F2EEEE" />
 
     <!-- Botão Salvar -->
-    <TextView
+    <Button
         android:id="@+id/btnSalvar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginBottom="8dp"
-        android:fontFamily="sans-serif-black"
+        android:backgroundTint="#082AEB"
+        android:fontFamily="sans-serif"
         android:onClick="salvarDados"
-        android:text="@string/salvar"
+        android:text="Salvar Dados"
         android:textColor="#F2EEEE"
         android:textSize="20sp"
         android:textStyle="normal" />
 
     <!-- Botão Meus Pedidos -->
-    <TextView
+    <Button
         android:id="@+id/btnMeusPedidos"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginBottom="12dp"
-        android:fontFamily="sans-serif-black"
+        android:backgroundTint="#092CEF"
+        android:fontFamily="sans-serif"
         android:onClick="meusPedidos"
-        android:text="@string/meuspedidos"
+        android:text="Meus Pedidos"
         android:textColor="#F2EEEE"
         android:textSize="20sp"
-        android:textStyle="normal|italic" />
+        android:textStyle="normal" />
 
     <!-- Botão Voltar -->
     <TextView
@@ -157,7 +162,7 @@
         android:text="@string/voltar"
         android:textColor="#F2EEEE"
         android:textSize="20sp"
-        android:textStyle="normal|italic" />
+        android:textStyle="normal" />
 
-  </LinearLayout>
+ </LinearLayout>
 </ScrollView>

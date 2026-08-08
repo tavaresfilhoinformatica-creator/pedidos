@@ -2,6 +2,8 @@ package com.example.nuvem
 
 import android.content.Intent
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.View
 import android.widget.EditText
 import android.widget.Toast
@@ -12,8 +14,13 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.room.Room
+import buscarCepViaCep
 import com.exemplo.meuapp.ui.perfil.PerfilViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class activity_dados_pessoais : AppCompatActivity() {
 
@@ -43,16 +50,31 @@ class activity_dados_pessoais : AppCompatActivity() {
             insets
         }
 
-        // --- NOVO: Observa e preenche os campos quando a tela abre ---
+        // --- Observa e preenche os campos quando a tela abre ---
         observarDadosERecuperar()
 
         // Solicita o carregamento dos dados gravados no banco
         viewModel.carregarDadosUsuario()
+
+        val edtCep = findViewById<EditText>(R.id.etCep)
+        edtCep.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+
+            override fun afterTextChanged(s: Editable?) {
+                val cepFormatado = s.toString().replace("-", "").replace(".", "").trim()
+
+                // Executa a busca assim que preencher os 8 números do CEP
+
+                if (cepFormatado.length == 8) {
+                    consultarEAtualizarEnderecoPorCep(cepFormatado)
+                }
+            }
+        })
     }
 
     private fun observarDadosERecuperar() {
         viewModel.dadosPessoaisLiveData.observe(this) { dados ->
-            // Se existirem dados salvos anteriormente, preenche na tela
             if (dados != null) {
                 findViewById<EditText>(R.id.etNome).setText(dados.nome)
                 findViewById<EditText>(R.id.etEndereco).setText(dados.endereco)
@@ -109,8 +131,57 @@ class activity_dados_pessoais : AppCompatActivity() {
         val intent = Intent(this, MainActivity::class.java)
         startActivity(intent)
     }
-    fun meusPedidos(view: View){
+
+    fun meusPedidos(view: View) {
         val intent = Intent(this, activity_historico_pedidos::class.java)
         startActivity(intent)
+    }
+
+    private fun consultarEAtualizarEnderecoPorCep(cep: String) {
+        lifecycleScope.launch(Dispatchers.IO) {
+            val endereco = buscarCepViaCep(cep)
+
+            withContext(Dispatchers.Main) {
+                if (endereco != null) {
+                    val etEndereco = findViewById<EditText>(R.id.etEndereco)
+                    val etBairro = findViewById<EditText>(R.id.etBairro)
+                    val etMunicipio = findViewById<EditText>(R.id.etMunicipio)
+                    val etEstado = findViewById<EditText>(R.id.etEstado)
+
+                    // 1. Atualiza os campos na tela
+                    etEndereco.setText(endereco.logradouro)
+                    etBairro.setText(endereco.bairro)
+                    etMunicipio.setText(endereco.localidade)
+                    etEstado.setText(endereco.uf)
+
+                    Toast.makeText(this@activity_dados_pessoais, "Endereço encontrado!", Toast.LENGTH_SHORT).show()
+
+                    // 2. Grava/Atualiza na tabela DadosPessoais do Room
+                    salvarEnderecoNoRoom(
+                        cep = cep,
+                        logradouro = endereco.logradouro,
+                        bairro = endereco.bairro
+                    )
+                } else {
+                    Toast.makeText(this@activity_dados_pessoais, "CEP não encontrado.", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
+    private fun salvarEnderecoNoRoom(cep: String, logradouro: String, bairro: String) {
+        val db = AppDatabase.getDatabase(this)
+        lifecycleScope.launch(Dispatchers.IO) {
+            val dadosAtuais = db.DadosPessoaisDao().obterDadosPessoais()
+
+            if (dadosAtuais != null) {
+                val dadosAtualizados = dadosAtuais.copy(
+                    cep = cep,
+                    endereco = logradouro,
+                    bairro = bairro
+                )
+                db.DadosPessoaisDao().salvar(dadosAtualizados)
+            }
+        }
     }
 }

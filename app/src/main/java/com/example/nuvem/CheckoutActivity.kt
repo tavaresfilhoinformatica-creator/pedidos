@@ -19,7 +19,9 @@ import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.math.BigDecimal
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class CheckoutActivity : AppCompatActivity() {
 
@@ -97,41 +99,35 @@ class CheckoutActivity : AppCompatActivity() {
 
         lifecycleScope.launch(Dispatchers.IO) {
             try {
-                Log.d("PAGAMENTO_TESTE", "Tentando buscar pagamentos do Retrofit...")
                 val pagamentosApi = RetrofitClient.apiService.obterTodas()
-                Log.d("PAGAMENTO_TESTE", "Veio da API: ${pagamentosApi.size} itens")
-
                 if (pagamentosApi.isNotEmpty()) {
                     db.PagamentoDao().inserirPagamentos(pagamentosApi)
-                    Log.d("PAGAMENTO_TESTE", "Pagamentos inseridos no Room com sucesso.")
                 }
             } catch (e: Exception) {
                 Log.e("PAGAMENTO_TESTE", "Erro ao buscar do Retrofit: ${e.message}", e)
             }
 
-            // Consulta o banco local Room
+            // Busca os objetos completos do Room
             val formas = db.PagamentoDao().obterTodas()
-            Log.d("PAGAMENTO_TESTE", "Total no Room local: ${formas.size} registros")
-
-            val nomesFormas = formas.map { it.descricao }
 
             withContext(Dispatchers.Main) {
-                if (nomesFormas.isNotEmpty()) {
-                    // Customização do Adapter para renderizar o texto do Spinner na cor BRANCA
-                    val adapter = object : ArrayAdapter<String>(
+                if (formas.isNotEmpty()) {
+                    val adapter = object : ArrayAdapter<Pagamento>(
                         this@CheckoutActivity,
                         android.R.layout.simple_spinner_item,
-                        nomesFormas
+                        formas
                     ) {
                         override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
                             val view = super.getView(position, convertView, parent) as TextView
                             view.setTextColor(Color.WHITE)
+                            view.text = getItem(position)?.descricao // Exibe a descrição no Spinner
                             return view
                         }
 
                         override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup): View {
                             val view = super.getDropDownView(position, convertView, parent) as TextView
                             view.setTextColor(Color.WHITE)
+                            view.text = getItem(position)?.descricao // Exibe a descrição no dropdown
                             return view
                         }
                     }
@@ -166,13 +162,20 @@ class CheckoutActivity : AppCompatActivity() {
             return
         }
 
-        val formaPagamento = spinnerPagamento.selectedItem ?: "Não informado"
+        // Resgata o objeto Pagamento selecionado no Spinner
+        val pagamentoSelecionado = spinnerPagamento.selectedItem as? Pagamento
 
-        // Monta a string de observação (ou salva só o texto da obs se não quiser concatenar o pagamento)
+        // Código de 2 caracteres enviado para a API/Aiven (ex: "01")
+        val codigoPagamento = pagamentoSelecionado?.codigo ?: "01"
+
+        // Descrição completa usada na observação
+        val descricaoPagamento = pagamentoSelecionado?.descricao ?: "Não informado"
+
+        // Monta a string de observação usando a descrição detalhada
         val obsFinal = if (observacaoDigitada.isNotEmpty()) {
-            "$observacaoDigitada | Pagamento: $formaPagamento"
+            "$observacaoDigitada | Pagamento: $descricaoPagamento"
         } else {
-            "Pagamento: $formaPagamento"
+            "Pagamento: $descricaoPagamento"
         }
 
         val db = AppDatabase.getDatabase(this)
@@ -200,7 +203,7 @@ class CheckoutActivity : AppCompatActivity() {
             val listaItensPedido = CarrinhoManager.itens.map { item ->
                 ItemPedido(
                     cpf = cpfCliente,
-                    pedido = novoNumeroPedido,
+                    pedido = novoNumeroPedido.toString(),
                     produto = item.produtoId,
                     descricao = item.nomeProduto,
                     quantidade = item.quantidade,
@@ -209,11 +212,14 @@ class CheckoutActivity : AppCompatActivity() {
                 )
             }
 
-            // 4. Salva no Room
+            // 4. Salva no Room local primeiro
             db.pedidoDao().inserirPedido(pedido)
             db.pedidoDao().inserirItensPedido(listaItensPedido)
 
-            // 5. Volta para a thread principal para limpar carrinho e avisar o usuário
+            // 5. AGUARDA o envio para o Aiven terminar na rede passando o codigoPagamento (2 dígitos)
+            enviarPedidoParaAiven(pedido, listaItensPedido, codigoPagamento.toString())
+
+            // 6. Transição de tela executada somente após a sincronização
             withContext(Dispatchers.Main) {
                 CarrinhoManager.limpar()
                 Toast.makeText(this@CheckoutActivity, "Pedido #$novoNumeroPedido realizado com sucesso!", Toast.LENGTH_LONG).show()
@@ -224,6 +230,49 @@ class CheckoutActivity : AppCompatActivity() {
                 startActivity(intent)
                 finish()
             }
+        }
+    }
+
+    private suspend fun enviarPedidoParaAiven(pedido: Pedido, itens: List<ItemPedido>, formaPagamento: String) {
+        try {
+            // Data atual formatada no padrão DD-MM-YYYY HH:mm:ss
+            val dataFormatada = SimpleDateFormat("dd-MM-yyyy HH:mm:ss", Locale.getDefault()).format(Date())
+
+            val requestAiven = PedidoAivenRequest(
+                cpf = pedido.cpf,
+                numero = pedido.numero,
+                data_pedido = dataFormatada,
+                formaPagamento = formaPagamento, // Envia o código de 2 caracteres
+                totalPedido = pedido.total_pedido.toDouble(),
+                enderecoEntrega = pedido.endereco_entrega,
+                bairroEntrega = pedido.bairro_entrega,
+                telefoneEntrega = pedido.telefone_entrega,
+                obs = pedido.obs,
+                cep_Entrega = pedido.cep_entrega,
+                itens = itens.map { item ->
+                    ItemPedidoAivenRequest(
+                        cpf = item.cpf,
+                        numero = item.pedido.toIntOrNull() ?: pedido.numero,
+                        produtoId = item.produto.toLongOrNull() ?: 0L,
+                        descricao = item.descricao,
+                        quantidade = item.quantidade,
+                        precoVenda = item.preco_venda.toDouble(),
+                        totalItem = item.total_item.toDouble()
+                    )
+                }
+            )
+
+            val resposta = RetrofitClient.apiService.enviarPedidoAiven(requestAiven)
+
+            withContext(Dispatchers.Main) {
+                if (resposta.isSuccessful && resposta.body()?.sucesso == true) {
+                    Log.d("AIVEN_SYNC", "Pedido #${pedido.numero} sincronizado com o Aiven com sucesso!")
+                } else {
+                    Log.e("AIVEN_SYNC", "Falha ao sincronizar com Aiven: ${resposta.errorBody()?.string()}")
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("AIVEN_SYNC", "Erro de conexão ao enviar para o Aiven: ${e.message}", e)
         }
     }
 }

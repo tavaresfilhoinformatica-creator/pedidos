@@ -23,5 +23,8 @@ interface ApiService {
     // Envia o pedido feito pelo cliente no app de volta para a nuvem
     @POST("pedidos")
     suspend fun enviarPedido(@Body pedido: Pedido): Response<Void>
+
+    @POST("pedidos")
+    suspend fun enviarPedidoAiven(@Body pedido: PedidoAivenRequest): Response<RespostaAiven>
 }
 
