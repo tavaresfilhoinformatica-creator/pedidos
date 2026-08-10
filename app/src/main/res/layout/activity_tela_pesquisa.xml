@@ -5,8 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#5F7DF6"
-    android:backgroundTint="#5F7DF6"
+    android:background="#2659F0"
     android:orientation="vertical"
     android:padding="16dp"
     tools:context=".telaPesquisa">
@@ -69,17 +68,18 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="16dp"
-        android:textColor="#F0EEEE"
         android:background="#5F7DF6"
+        android:padding="8dp"
         android:popupBackground="#5F7DF6"
-         android:padding="8dp"
+        android:textColor="#F0EEEE"
         android:visibility="gone" />
 
-    <TextView
+    <Button
         android:id="@+id/btnPesquisar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
+        android:backgroundTint="#2A3880"
         android:fontFamily="sans-serif-black"
         android:onClick="pesquisar"
         android:text="@string/pesquisar"

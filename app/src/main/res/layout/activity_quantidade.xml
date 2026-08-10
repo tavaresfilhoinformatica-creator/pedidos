@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#5F7DF6"
+    android:background="#2659F0"
     android:gravity="center_horizontal"
     android:orientation="vertical"
     android:padding="24dp">
@@ -95,7 +95,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="12dp"
-        android:backgroundTint="#092CF2"
+        android:backgroundTint="#2A3880"
         android:text="Continuar Comprando"
         android:textColor="#EDE4E4" />
 
@@ -104,7 +104,7 @@
         android:id="@+id/btnFinalizarPedido"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:backgroundTint="#0633E7"
+        android:backgroundTint="#2A3880"
         android:text="Meu Carrinho"
         android:textColor="#E9D7D7" />
 

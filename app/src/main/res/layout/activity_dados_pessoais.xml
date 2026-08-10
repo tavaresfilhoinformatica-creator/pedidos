@@ -4,7 +4,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#5F7DF6"
+    android:background="#2659F0"
     android:fillViewport="true">
 
  <LinearLayout
@@ -127,7 +127,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginBottom="8dp"
-        android:backgroundTint="#082AEB"
+        android:backgroundTint="#2A3880"
         android:fontFamily="sans-serif"
         android:onClick="salvarDados"
         android:text="Salvar Dados"
@@ -142,7 +142,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginBottom="12dp"
-        android:backgroundTint="#092CEF"
+        android:backgroundTint="#2A3880"
         android:fontFamily="sans-serif"
         android:onClick="meusPedidos"
         android:text="Meus Pedidos"

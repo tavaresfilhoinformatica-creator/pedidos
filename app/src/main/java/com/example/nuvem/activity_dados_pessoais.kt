@@ -164,7 +164,7 @@ class activity_dados_pessoais : AppCompatActivity() {
                         etEstado.setText(endereco.uf)
                     }
 
-                    Toast.makeText(this@activity_dados_pessoais, "CEP localizado!", Toast.LENGTH_SHORT).show()
+
 
                     // Resgata o valor final do endereço exibido na tela para salvar no Room
                     val enderecoFinal = etEndereco.text.toString()

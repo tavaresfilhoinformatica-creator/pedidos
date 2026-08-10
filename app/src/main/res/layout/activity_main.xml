@@ -6,7 +6,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#5F7DF6"
+    android:background="#2659F0"
     tools:context=".MainActivity">
 
     <ImageView
@@ -29,7 +29,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:layout_marginBottom="97dp"
-        android:backgroundTint="#092BE9"
+        android:backgroundTint="#2A3880"
         android:fontFamily="sans-serif"
         android:onClick="cardapio"
         android:text="Produtos"
@@ -47,7 +47,7 @@
         android:layout_width="409dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="74dp"
-        android:backgroundTint="#0E30EB"
+        android:backgroundTint="#2A3880"
         android:fontFamily="sans-serif"
         android:onClick="dadosPessoais"
         android:text="Meus Dados"
