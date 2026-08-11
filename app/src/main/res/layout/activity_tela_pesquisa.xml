@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#2659F0"
+    android:orientation="vertical"
+    android:padding="16dp"
+    tools:context=".telaPesquisa">
+
+    <ImageView
+        android:id="@+id/imageView2"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        app:srcCompat="@drawable/mensagem" />
+
+    <!-- RadioGroup agrupando corretamente os botões de opção -->
+    <RadioGroup
+        android:id="@+id/radioOpcoes"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/tituloOpcao"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="Por Título"
+            android:textColor="#EFEBEB"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <RadioButton
+            android:id="@+id/grupoOpcao"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:text="Por Grupo"
+            android:textColor="#E4DBDB"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+    </RadioGroup>
+
+    <EditText
+        android:id="@+id/pesqEdit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:backgroundTint="#EDE6E6"
+        android:backgroundTintMode="src_over"
+        android:breakStrategy="high_quality"
+        android:ems="10"
+        android:hint="Pesquise aqui, em branco para todos"
+        android:inputType="text"
+        android:textColor="#EFEAEA"
+        android:textColorHint="#F2EBEB"
+        android:visibility="visible" />
+
+    <!-- Spinner posicionado após a caixa de texto e antes dos botões -->
+    <Spinner
+        android:id="@+id/spinnerGrupos"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="16dp"
+        android:background="#5F7DF6"
+        android:padding="8dp"
+        android:popupBackground="#5F7DF6"
+        android:textColor="#F0EEEE"
+        android:visibility="gone" />
+
+    <Button
+        android:id="@+id/btnPesquisar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:backgroundTint="#2A3880"
+        android:fontFamily="sans-serif-black"
+        android:onClick="pesquisar"
+        android:text="@string/pesquisar"
+        android:textColor="#EEF0EE"
+        android:textSize="20sp" />
+
+
+    <TextView
+        android:id="@+id/btnInicio"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="15dp"
+        android:backgroundTint="#4D4949"
+        android:fontFamily="sans-serif-black"
+        android:onClick="telaInicial"
+        android:text="@string/inicio"
+        android:textColor="#EDE3E3"
+        android:textSize="20sp" />
+
+
+</LinearLayout>
