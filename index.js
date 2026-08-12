@@ -51,27 +51,14 @@ app.get('/pagamentos', async (req, res) => {
   }
 });
 
-// 5. Salvar ou Atualizar Cliente no Aiven
+// Rota de Clientes mantida caso seja chamada individualmente
 app.post('/clientes', async (req, res) => {
   try {
     const { 
-      codigo, 
-      nome, 
-      endereco, 
-      cpf, 
-      bairro, 
-      estado, 
-      municipio, 
-      cep, 
-      email, 
-      niver, 
-      telefone_1, 
-      telefone_2, 
-      telefone_3, 
-      obs 
+      codigo, nome, endereco, cpf, bairro, estado, municipio, 
+      cep, email, niver, telefone_1, telefone_2, telefone_3, obs 
     } = req.body;
 
-    // Coloquei a trava no 'codigo' (mude para 'cpf' se a sua PRIMARY KEY no banco for o cpf)
     const queryCliente = `
       INSERT INTO cliente (
         codigo, nome, endereco, cpf, bairro, estado, municipio, cep, email, niver, telefone_1, telefone_2, telefone_3, obs
@@ -80,7 +67,6 @@ app.post('/clientes', async (req, res) => {
       ON CONFLICT (cpf) DO UPDATE SET
         nome = EXCLUDED.nome,
         endereco = EXCLUDED.endereco,
-        cpf = EXCLUDED.cpf,
         bairro = EXCLUDED.bairro,
         estado = EXCLUDED.estado,
         municipio = EXCLUDED.municipio,
@@ -94,10 +80,10 @@ app.post('/clientes', async (req, res) => {
     `;
 
     const valoresCliente = [
-      codigo,
+      codigo || '0001',
       nome || 'Não informado',
       endereco || '',
-      cpf || null,
+      cpf,
       bairro || '',
       estado || 'RJ',
       municipio || 'RIO DE JANEIRO',
@@ -112,7 +98,7 @@ app.post('/clientes', async (req, res) => {
 
     await pool.query(queryCliente, valoresCliente);
 
-    console.log(`[CLIENTE] Código ${codigo} processado com sucesso.`);
+    console.log(`[CLIENTE] CPF ${cpf} processado com sucesso.`);
 
     res.status(200).json({ 
       sucesso: true, 
@@ -128,12 +114,14 @@ app.post('/clientes', async (req, res) => {
   }
 });
 
-// 4. Salvar Pedido e Itens no Aiven (Estrutura Real do Banco)
+// 4. Salvar Pedido, Cliente e Itens no Aiven (Unificado)
 app.post('/pedidos', async (req, res) => {
   const client = await pool.connect();
   try {
     const { 
       cpf, 
+      cliente_nome,
+      codigo_cliente,
       numero, 
       data_pedido,      
       formaPagamento,
@@ -148,7 +136,39 @@ app.post('/pedidos', async (req, res) => {
 
     await client.query('BEGIN');
 
-    // 1. Insere o cabeçalho do pedido (Retorna cpf e numero reais)
+    // 1. GRAVA OU ATUALIZA O CLIENTE PRIMEIRO
+    if (cpf) {
+      const queryCliente = `
+        INSERT INTO cliente (
+          codigo, nome, endereco, cpf, bairro, estado, municipio, cep, telefone_1, obs
+        )
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+        ON CONFLICT (cpf) DO UPDATE SET
+          nome = COALESCE(EXCLUDED.nome, cliente.nome),
+          endereco = COALESCE(EXCLUDED.endereco, cliente.endereco),
+          bairro = COALESCE(EXCLUDED.bairro, cliente.bairro),
+          cep = COALESCE(EXCLUDED.cep, cliente.cep),
+          telefone_1 = COALESCE(EXCLUDED.telefone_1, cliente.telefone_1);
+      `;
+
+      const valoresCliente = [
+        codigo_cliente || '0001',
+        cliente_nome || 'Não informado',
+        enderecoEntrega || '',
+        cpf,
+        bairroEntrega || '',
+        'RJ',
+        'RIO DE JANEIRO',
+        cep_Entrega || '',
+        telefoneEntrega || '',
+        obs || null
+      ];
+
+      await client.query(queryCliente, valoresCliente);
+      console.log(`[CLIENTE] CPF ${cpf} gravado/atualizado via /pedidos.`);
+    }
+
+    // 2. INSERE O CABEÇALHO DO PEDIDO
     const queryPedido = `
       INSERT INTO pedido (
         cpf, 
@@ -182,7 +202,7 @@ app.post('/pedidos', async (req, res) => {
     const resPedido = await client.query(queryPedido, valoresPedido);
     const pedidoCriado = resPedido.rows[0];
 
-    // 2. Insere os itens na tabela 'item_pedido' usando as colunas reais do Aiven
+    // 3. INSERE OS ITENS
     const queryItem = `
       INSERT INTO item_pedido (cpf, pedido, produto, quantidade, preco_venda, total_item)
       VALUES ($1, $2, $3, $4, $5, $6);
@@ -205,7 +225,7 @@ app.post('/pedidos', async (req, res) => {
 
     res.status(201).json({ 
       sucesso: true, 
-      mensagem: "Pedido e itens gravados no Aiven com sucesso!",
+      mensagem: "Cliente, Pedido e Itens gravados no Aiven com sucesso!",
       numeroPedido: pedidoCriado.numero
     });
 
