@@ -51,11 +51,11 @@ app.get('/pagamentos', async (req, res) => {
   }
 });
 
-// Rota de Clientes mantida caso seja chamada individualmente
+// Rota de Clientes (chamada individual)
 app.post('/clientes', async (req, res) => {
   try {
     const { 
-      codigo, nome, endereco, cpf, bairro, estado, municipio, 
+      codigo, nome, cliente_nome, clienteNome, endereco, cpf, bairro, estado, municipio, 
       cep, email, niver, telefone_1, telefone_2, telefone_3, obs 
     } = req.body;
 
@@ -81,15 +81,15 @@ app.post('/clientes', async (req, res) => {
 
     const valoresCliente = [
       codigo || '0001',
-      nome || 'Não informado',
+      nome || cliente_nome || clienteNome || req.body.cliente || 'Não informado',
       endereco || '',
       cpf,
       bairro || '',
       estado || 'RJ',
       municipio || 'RIO DE JANEIRO',
       cep || '',
-      email || '',
-      niver || null,
+      email || '', 
+      niver || '',
       telefone_1 || '',
       telefone_2 || null,
       telefone_3 || null,
@@ -120,7 +120,9 @@ app.post('/pedidos', async (req, res) => {
   try {
     const { 
       cpf, 
-      cliente_nome,
+      nome,             // Captura se o app mandar 'nome'
+      cliente_nome,     // Captura se o app mandar 'cliente_nome'
+      clienteNome,      // Captura se o app mandar 'clienteNome'
       codigo_cliente,
       numero, 
       data_pedido,      
@@ -136,7 +138,6 @@ app.post('/pedidos', async (req, res) => {
 
     await client.query('BEGIN');
 
-    // 1. GRAVA OU ATUALIZA O CLIENTE PRIMEIRO
     // 1. GRAVA OU ATUALIZA O CLIENTE PRIMEIRO
     if (cpf) {
       const queryCliente = `
@@ -157,9 +158,12 @@ app.post('/pedidos', async (req, res) => {
           obs = EXCLUDED.obs;
       `;
 
+      // Pega o nome vindo de qualquer variação do JSON
+      const nomeFinal = nome || cliente_nome || clienteNome || req.body.cliente || 'Não informado';
+
       const valoresCliente = [
         codigo_cliente || '0001',
-        cliente_nome || req.body.nome || 'Não informado',
+        nomeFinal,
         enderecoEntrega || req.body.endereco || '',
         cpf,
         bairroEntrega || req.body.bairro || '',
@@ -167,14 +171,15 @@ app.post('/pedidos', async (req, res) => {
         req.body.municipio || 'RIO DE JANEIRO',
         cep_Entrega || req.body.cep || '',
         req.body.email || '', 
-        req.body.niver || '', // Garante string vazia se vier null
+        req.body.niver || '',
         telefoneEntrega || req.body.telefone_1 || '',
         obs || null
       ];
 
       await client.query(queryCliente, valoresCliente);
-      console.log(`[CLIENTE] CPF ${cpf} gravado/atualizado via /pedidos.`);
+      console.log(`[CLIENTE] CPF ${cpf} (${nomeFinal}) gravado/atualizado via /pedidos.`);
     }
+
     // 2. INSERE O CABEÇALHO DO PEDIDO
     const queryPedido = `
       INSERT INTO pedido (
