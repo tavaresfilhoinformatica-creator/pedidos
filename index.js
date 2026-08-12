@@ -71,6 +71,7 @@ app.post('/clientes', async (req, res) => {
       obs 
     } = req.body;
 
+    // Coloquei a trava no 'codigo' (mude para 'cpf' se a sua PRIMARY KEY no banco for o cpf)
     const queryCliente = `
       INSERT INTO cliente (
         codigo, nome, endereco, cpf, bairro, estado, municipio, cep, email, niver, telefone_1, telefone_2, telefone_3, obs
@@ -79,22 +80,30 @@ app.post('/clientes', async (req, res) => {
       ON CONFLICT (cpf) DO UPDATE SET
         nome = EXCLUDED.nome,
         endereco = EXCLUDED.endereco,
+        cpf = EXCLUDED.cpf,
         bairro = EXCLUDED.bairro,
+        estado = EXCLUDED.estado,
+        municipio = EXCLUDED.municipio,
         cep = EXCLUDED.cep,
-        telefone_1 = EXCLUDED.telefone_1;
+        email = EXCLUDED.email,
+        niver = EXCLUDED.niver,
+        telefone_1 = EXCLUDED.telefone_1,
+        telefone_2 = EXCLUDED.telefone_2,
+        telefone_3 = EXCLUDED.telefone_3,
+        obs = EXCLUDED.obs;
     `;
 
     const valoresCliente = [
-      codigo || '0001',
+      codigo,
       nome || 'Não informado',
       endereco || '',
-      cpf,
+      cpf || null,
       bairro || '',
       estado || 'RJ',
       municipio || 'RIO DE JANEIRO',
       cep || '',
       email || '',
-      niver || '',
+      niver || null,
       telefone_1 || '',
       telefone_2 || null,
       telefone_3 || null,
@@ -102,6 +111,8 @@ app.post('/clientes', async (req, res) => {
     ];
 
     await pool.query(queryCliente, valoresCliente);
+
+    console.log(`[CLIENTE] Código ${codigo} processado com sucesso.`);
 
     res.status(200).json({ 
       sucesso: true, 
