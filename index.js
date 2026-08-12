@@ -137,37 +137,42 @@ app.post('/pedidos', async (req, res) => {
     await client.query('BEGIN');
 
     // 1. GRAVA OU ATUALIZA O CLIENTE PRIMEIRO
+    // 1. GRAVA OU ATUALIZA O CLIENTE PRIMEIRO
     if (cpf) {
       const queryCliente = `
         INSERT INTO cliente (
-          codigo, nome, endereco, cpf, bairro, estado, municipio, cep, telefone_1, obs
+          codigo, nome, endereco, cpf, bairro, estado, municipio, cep, email, telefone_1, obs
         )
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
         ON CONFLICT (cpf) DO UPDATE SET
-          nome = COALESCE(EXCLUDED.nome, cliente.nome),
-          endereco = COALESCE(EXCLUDED.endereco, cliente.endereco),
-          bairro = COALESCE(EXCLUDED.bairro, cliente.bairro),
-          cep = COALESCE(EXCLUDED.cep, cliente.cep),
-          telefone_1 = COALESCE(EXCLUDED.telefone_1, cliente.telefone_1);
+          nome = EXCLUDED.nome,
+          endereco = EXCLUDED.endereco,
+          bairro = EXCLUDED.bairro,
+          estado = EXCLUDED.estado,
+          municipio = EXCLUDED.municipio,
+          cep = EXCLUDED.cep,
+          email = EXCLUDED.email,
+          telefone_1 = EXCLUDED.telefone_1,
+          obs = EXCLUDED.obs;
       `;
 
       const valoresCliente = [
         codigo_cliente || '0001',
-        cliente_nome || 'Não informado',
-        enderecoEntrega || '',
+        cliente_nome || req.body.nome || 'Não informado',
+        enderecoEntrega || req.body.endereco || '',
         cpf,
-        bairroEntrega || '',
-        'RJ',
-        'RIO DE JANEIRO',
-        cep_Entrega || '',
-        telefoneEntrega || '',
+        bairroEntrega || req.body.bairro || '',
+        req.body.estado || 'RJ',
+        req.body.municipio || 'RIO DE JANEIRO',
+        cep_Entrega || req.body.cep || '',
+        req.body.email || '', // Garante string vazia se vier null
+        telefoneEntrega || req.body.telefone_1 || '',
         obs || null
       ];
 
       await client.query(queryCliente, valoresCliente);
       console.log(`[CLIENTE] CPF ${cpf} gravado/atualizado via /pedidos.`);
     }
-
     // 2. INSERE O CABEÇALHO DO PEDIDO
     const queryPedido = `
       INSERT INTO pedido (
