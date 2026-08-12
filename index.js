@@ -141,9 +141,9 @@ app.post('/pedidos', async (req, res) => {
     if (cpf) {
       const queryCliente = `
         INSERT INTO cliente (
-          codigo, nome, endereco, cpf, bairro, estado, municipio, cep, email, telefone_1, obs
+          codigo, nome, endereco, cpf, bairro, estado, municipio, cep, email, niver, telefone_1, obs
         )
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
         ON CONFLICT (cpf) DO UPDATE SET
           nome = EXCLUDED.nome,
           endereco = EXCLUDED.endereco,
@@ -152,6 +152,7 @@ app.post('/pedidos', async (req, res) => {
           municipio = EXCLUDED.municipio,
           cep = EXCLUDED.cep,
           email = EXCLUDED.email,
+          niver = EXCLUDED.niver,
           telefone_1 = EXCLUDED.telefone_1,
           obs = EXCLUDED.obs;
       `;
@@ -165,7 +166,8 @@ app.post('/pedidos', async (req, res) => {
         req.body.estado || 'RJ',
         req.body.municipio || 'RIO DE JANEIRO',
         cep_Entrega || req.body.cep || '',
-        req.body.email || '', // Garante string vazia se vier null
+        req.body.email || '', 
+        req.body.niver || '', // Garante string vazia se vier null
         telefoneEntrega || req.body.telefone_1 || '',
         obs || null
       ];
