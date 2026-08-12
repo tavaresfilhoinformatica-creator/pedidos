@@ -26,5 +26,9 @@ interface ApiService {
 
     @POST("pedidos")
     suspend fun enviarPedidoAiven(@Body pedido: PedidoAivenRequest): Response<RespostaAiven>
+
+   // Substitua "clientes" pela rota real cadastrada na sua API backend (ex: "cliente", "api/cliente", "cadastrar-cliente")
+    @POST("cliente")
+    suspend fun cadastrarClienteAiven(@Body cliente: ClienteAivenRequest): Response<RespostaPadrao>
 }
 

@@ -181,13 +181,21 @@ class CheckoutActivity : AppCompatActivity() {
         val db = AppDatabase.getDatabase(this)
 
         lifecycleScope.launch(Dispatchers.IO) {
-            // 1. Gera o próximo número de pedido para este CPF
+            // 1. Busca os dados pessoais do cliente no Room e envia para o Aiven primeiro
+            val dadosPessoais = db.DadosPessoaisDao().obterDadosPessoais()
+            if (dadosPessoais != null) {
+                enviarClienteParaAiven(dadosPessoais)
+            } else {
+                Log.w("AIVEN_SYNC", "Dados Pessoais não encontrados no banco local antes do envio do pedido.")
+            }
+
+            // 2. Gera o próximo número de pedido para este CPF
             val ultimoNumero = db.pedidoDao().obterUltimoNumeroPedidoPorCpf(cpfCliente) ?: 0
             val novoNumeroPedido = ultimoNumero + 1
 
             val totalPedido = CarrinhoManager.calcularTotal()
 
-            // 2. Instancia a Entity Pedido gravando a Observação
+            // 3. Instancia a Entity Pedido gravando a Observação
             val pedido = Pedido(
                 cpf = cpfCliente,
                 numero = novoNumeroPedido,
@@ -199,7 +207,7 @@ class CheckoutActivity : AppCompatActivity() {
                 obs = obsFinal
             )
 
-            // 3. Mapeia os itens do carrinho para ItemPedido
+            // 4. Mapeia os itens do carrinho para ItemPedido
             val listaItensPedido = CarrinhoManager.itens.map { item ->
                 ItemPedido(
                     cpf = cpfCliente,
@@ -212,14 +220,14 @@ class CheckoutActivity : AppCompatActivity() {
                 )
             }
 
-            // 4. Salva no Room local primeiro
+            // 5. Salva no Room local primeiro
             db.pedidoDao().inserirPedido(pedido)
             db.pedidoDao().inserirItensPedido(listaItensPedido)
 
-            // 5. AGUARDA o envio para o Aiven terminar na rede passando o codigoPagamento (2 dígitos)
+            // 6. AGUARDA o envio para o Aiven terminar na rede passando o codigoPagamento (2 dígitos)
             enviarPedidoParaAiven(pedido, listaItensPedido, codigoPagamento.toString())
 
-            // 6. Transição de tela executada somente após a sincronização
+            // 7. Transição de tela executada somente após a sincronização
             withContext(Dispatchers.Main) {
                 CarrinhoManager.limpar()
                 Toast.makeText(this@CheckoutActivity, "Pedido #$novoNumeroPedido realizado com sucesso!", Toast.LENGTH_LONG).show()
@@ -273,6 +281,35 @@ class CheckoutActivity : AppCompatActivity() {
             }
         } catch (e: Exception) {
             Log.e("AIVEN_SYNC", "Erro de conexão ao enviar para o Aiven: ${e.message}", e)
+        }
+    }
+    private suspend fun enviarClienteParaAiven(dados: DadosPessoais) {
+        try {
+            val requestCliente = ClienteAivenRequest(
+                codigo = dados.codigo.toString().padStart(4, '0'), // Garante formato CHAR(4)
+                nome = dados.nome,
+                endereco = dados.endereco,
+                cpf = dados.cpf,
+                bairro = dados.bairro,
+                estado = if (dados.estado.isBlank()) "RJ" else dados.estado,
+                municipio = if (dados.municipio.isBlank()) "RIO DE JANEIRO" else dados.municipio,
+                cep = dados.cep ?: "",
+                email = dados.email ?: "",
+                niver = dados.niver ?: "",
+                telefone_1 = dados.telefone
+            )
+
+            val resposta = RetrofitClient.apiService.cadastrarClienteAiven(requestCliente)
+
+            withContext(Dispatchers.Main) {
+                if (resposta.isSuccessful) {
+                    Log.d("AIVEN_SYNC", "Cliente CPF ${dados.cpf} sincronizado com sucesso!")
+                } else {
+                    Log.e("AIVEN_SYNC", "Erro ao sincronizar cliente: ${resposta.errorBody()?.string()}")
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("AIVEN_SYNC", "Erro de conexão ao enviar cliente: ${e.message}", e)
         }
     }
 }
