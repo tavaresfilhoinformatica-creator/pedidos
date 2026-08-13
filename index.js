@@ -237,7 +237,7 @@ app.post('/pedidos', async (req, res) => {
 
     res.status(201).json({ 
       sucesso: true, 
-      mensagem: "Cliente, Pedido e Itens gravados no Aiven com sucesso!",
+      mensagem: "Cliente, Pedido e Itens gravados no Banco Aiven com sucesso!",
       numeroPedido: pedidoCriado.numero
     });
 
