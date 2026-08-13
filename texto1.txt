@@ -1,16 +1,9 @@
-Próximos passos:
-
-Eu tenho definido essas duas tabelas (pedido , item pedido) a minha ideia é:
-
-1) Usuário escolhe o produto clicando no cardview de produtos
-2) Ele é direcionado para uma nova activity onde é mostrado o cardview escolhido e uma opção para indicar a quantidade.
-Aparece as sequintes opções:
-	2.1) Confirmar item
-	2.2) Continuar comprando
-	2.3) Finalizar compra
-3) Ao finaliar a compra, aparecem todos os itens escolhidos, opção de informar local de entrega(que por default buscará os dados na tabela dados pessoias)
-e a forma de pagamento (um spinner com as formas de pagamentos). E as opções
-	3.1) enviar pedido
-	3.2) continuar comprando
-4) Ao enviar o pedido a tabela Room na Aiven é atualizada e é disparado um SMS avisando que foi gerado um novo pedido. Obs: os pedidos enviados,
-para uma futura consulta e até mesmo poder repetir esse pedido.
+Erro: SyntaxError: Unexpected token < in JSON at position 0
+    at JSON.parse (<anonymous>)
+    at parseJSONFromBytes (node:internal/deps/undici/undici:6662:19)
+    at successSteps (node:internal/deps/undici/undici:6636:27)
+    at node:internal/deps/undici/undici:1236:60
+    at node:internal/process/task_queues:140:7
+    at AsyncResource.runInAsyncScope (node:async_hooks:203:9)
+    at AsyncResource.runMicrotask (node:internal/process/task_queues:137:8)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
