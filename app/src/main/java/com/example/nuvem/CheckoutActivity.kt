@@ -84,6 +84,7 @@ class CheckoutActivity : AppCompatActivity() {
             val dados = db.DadosPessoaisDao().obterDadosPessoais()
             withContext(Dispatchers.Main) {
                 dados?.let {
+
                     cpfCliente = it.cpf
                     edtEndereco.setText(it.endereco)
                     edtBairro.setText(it.bairro)
@@ -181,8 +182,11 @@ class CheckoutActivity : AppCompatActivity() {
         val db = AppDatabase.getDatabase(this)
 
         lifecycleScope.launch(Dispatchers.IO) {
-            // 1. Busca os dados pessoais do cliente no Room e envia para o Aiven primeiro
+            // 1. Busca os dados pessoais do cliente no Room primeiro
             val dadosPessoais = db.DadosPessoaisDao().obterDadosPessoais()
+            val nomeCliente = dadosPessoais?.nome ?: ""
+
+            // Envia o cliente de forma síncrona/aguardando a conclusão
             if (dadosPessoais != null) {
                 enviarClienteParaAiven(dadosPessoais)
             } else {
@@ -224,8 +228,8 @@ class CheckoutActivity : AppCompatActivity() {
             db.pedidoDao().inserirPedido(pedido)
             db.pedidoDao().inserirItensPedido(listaItensPedido)
 
-            // 6. AGUARDA o envio para o Aiven terminar na rede passando o codigoPagamento (2 dígitos)
-            enviarPedidoParaAiven(pedido, listaItensPedido, codigoPagamento.toString())
+            // 6. AGUARDA o envio para o Aiven passar o nome do cliente e o codigoPagamento (2 dígitos)
+            enviarPedidoParaAiven(pedido, listaItensPedido, codigoPagamento.toString(), nomeCliente)
 
             // 7. Transição de tela executada somente após a sincronização
             withContext(Dispatchers.Main) {
@@ -241,13 +245,19 @@ class CheckoutActivity : AppCompatActivity() {
         }
     }
 
-    private suspend fun enviarPedidoParaAiven(pedido: Pedido, itens: List<ItemPedido>, formaPagamento: String) {
+    private suspend fun enviarPedidoParaAiven(
+        pedido: Pedido,
+        itens: List<ItemPedido>,
+        formaPagamento: String,
+        nomeCliente: String
+    ) {
         try {
             // Data atual formatada no padrão DD-MM-YYYY HH:mm:ss
             val dataFormatada = SimpleDateFormat("dd-MM-yyyy HH:mm:ss", Locale.getDefault()).format(Date())
 
             val requestAiven = PedidoAivenRequest(
                 cpf = pedido.cpf,
+                nome = nomeCliente, // Envia o nome retornado dos dados pessoais
                 numero = pedido.numero,
                 data_pedido = dataFormatada,
                 formaPagamento = formaPagamento, // Envia o código de 2 caracteres
@@ -283,6 +293,7 @@ class CheckoutActivity : AppCompatActivity() {
             Log.e("AIVEN_SYNC", "Erro de conexão ao enviar para o Aiven: ${e.message}", e)
         }
     }
+
     private suspend fun enviarClienteParaAiven(dados: DadosPessoais) {
         try {
             val requestCliente = ClienteAivenRequest(

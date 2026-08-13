@@ -1,6 +1,7 @@
 package com.example.nuvem
 
 data class PedidoAivenRequest(
+    val nome: String? = null,
     val cpf: String,
     val numero: Int,
     val data_pedido: String,
