@@ -1,9 +1,123 @@
-// 4. Salvar Pedido, Cliente e Itens no Aiven (Unificado + Log de Diagnóstico)
+require('dotenv').config();
+const express = require('express');
+const { Pool } = require('pg');
+const cors = require('cors');
+
+const app = express();
+app.use(express.json());
+app.use(cors());
+
+// Conexão com o PostgreSQL do Aiven
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false
+  }
+});
+
+// --- ROTAS DA API ---
+
+app.get('/teste', (req, res) => {
+  res.send("API Node está viva!");
+});
+
+app.get('/grupos', async (req, res) => {
+  try {
+    const { rows } = await pool.query('SELECT * FROM grupo');
+    res.json(rows);
+  } catch (err) {
+    console.error("Erro ao buscar grupos:", err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/produtos', async (req, res) => {
+  try {
+    const { rows } = await pool.query('SELECT * FROM produto');
+    res.json(rows);
+  } catch (err) {
+    console.error("Erro ao buscar produtos:", err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/pagamentos', async (req, res) => {
+  try {
+    const { rows } = await pool.query('SELECT * FROM pagamento');
+    res.json(rows);
+  } catch (err) {
+    console.error("Erro ao buscar pagamentos:", err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Rota de Clientes (chamada individual)
+app.post('/clientes', async (req, res) => {
+  try {
+    const { 
+      codigo, nome, cliente_nome, clienteNome, endereco, cpf, bairro, estado, municipio, 
+      cep, email, niver, telefone_1, telefone_2, telefone_3, obs 
+    } = req.body;
+
+    const queryCliente = `
+      INSERT INTO cliente (
+        codigo, nome, endereco, cpf, bairro, estado, municipio, cep, email, niver, telefone_1, telefone_2, telefone_3, obs
+      )
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+      ON CONFLICT (cpf) DO UPDATE SET
+        nome = EXCLUDED.nome,
+        endereco = EXCLUDED.endereco,
+        bairro = EXCLUDED.bairro,
+        estado = EXCLUDED.estado,
+        municipio = EXCLUDED.municipio,
+        cep = EXCLUDED.cep,
+        email = EXCLUDED.email,
+        niver = EXCLUDED.niver,
+        telefone_1 = EXCLUDED.telefone_1,
+        telefone_2 = EXCLUDED.telefone_2,
+        telefone_3 = EXCLUDED.telefone_3,
+        obs = EXCLUDED.obs;
+    `;
+
+    const valoresCliente = [
+      codigo || '0001',
+      nome || cliente_nome || clienteNome || req.body.cliente || 'Não informado',
+      endereco || '',
+      cpf,
+      bairro || '',
+      estado || 'RJ',
+      municipio || 'RIO DE JANEIRO',
+      cep || '',
+      email || '', 
+      niver || '',
+      telefone_1 || '',
+      telefone_2 || null,
+      telefone_3 || null,
+      obs || null
+    ];
+
+    await pool.query(queryCliente, valoresCliente);
+    console.log(`[CLIENTE] CPF ${cpf} processado com sucesso.`);
+
+    res.status(200).json({ 
+      sucesso: true, 
+      mensagem: "Cliente salvo/atualizado no Aiven com sucesso!" 
+    });
+
+  } catch (err) {
+    console.error("Erro ao salvar cliente no Aiven:", err.message);
+    res.status(500).json({ 
+      sucesso: false, 
+      mensagem: err.message 
+    });
+  }
+});
+
+// 4. Salvar Pedido, Cliente e Itens no Aiven (Unificado)
 app.post('/pedidos', async (req, res) => {
-  // --- IMPRIME O QUE CHEGOU DO ANDROID NO PAINEL DO RENDER ---
-  console.log("=== REQUISIÇÃO RECEBIDA DO ANDROID ===");
+  console.log("=== DADOS RECEBIDOS DO ANDROID ===");
   console.log(JSON.stringify(req.body, null, 2));
-  console.log("======================================");
+  console.log("==================================");
 
   const client = await pool.connect();
   try {
@@ -91,8 +205,7 @@ app.post('/pedidos', async (req, res) => {
       numero, 
       data_pedido, 
       formaPagamento, 
-      totalPedido, 
-      totalPedido ? totalPedido : 0, // Fallback se vier algo zerado
+      totalPedido || 0, 
       enderecoEntrega, 
       bairroEntrega, 
       telefoneEntrega, 
@@ -100,19 +213,7 @@ app.post('/pedidos', async (req, res) => {
       cep_Entrega
     ];
 
-    // Ajuste dos valores reais do pedido
-    const resPedido = await client.query(queryPedido, [
-      cpf, 
-      numero, 
-      data_pedido, 
-      formaPagamento, 
-      totalPedido, 
-      enderecoEntrega, 
-      bairroEntrega, 
-      telefoneEntrega, 
-      obs, 
-      cep_Entrega
-    ]);
+    const resPedido = await client.query(queryPedido, valoresPedido);
     const pedidoCriado = resPedido.rows[0];
 
     // 3. INSERE OS ITENS
@@ -138,7 +239,7 @@ app.post('/pedidos', async (req, res) => {
 
     res.status(201).json({ 
       sucesso: true, 
-      mensagem: "Cliente, Pedido e Itens gravados no Banco de dados Aiven com sucesso!",
+      mensagem: "Cliente, Pedido e Itens gravados no Banco Aiven com sucesso!",
       numeroPedido: pedidoCriado.numero
     });
 
@@ -153,4 +254,9 @@ app.post('/pedidos', async (req, res) => {
   } finally {
     client.release();
   }
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`🚀 API rodando com sucesso na porta ${PORT}`);
 });
