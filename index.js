@@ -15,6 +15,19 @@ const pool = new Pool({
   }
 });
 
+// Função auxiliar para converter "DD-MM-YYYY HH:mm:ss" em "YYYY-MM-DD HH:mm:ss"
+function formatarDataParaPostgres(dataStr) {
+  if (!dataStr) return new Date();
+  // Se estiver no formato DD-MM-YYYY ou DD/MM/YYYY
+  const regexDataBR = /^(\d{2})[-/](\d{2})[-/](\d{4})(.*)$/;
+  const match = dataStr.match(regexDataBR);
+  if (match) {
+    const [, dia, mes, ano, restoHora] = match;
+    return `${ano}-${mes}-${dia}${restoHora}`;
+  }
+  return dataStr;
+}
+
 // --- ROTAS DA API ---
 
 app.get('/teste', (req, res) => {
@@ -143,13 +156,25 @@ app.post('/pedidos', async (req, res) => {
 
     // 1. GRAVA OU ATUALIZA O CLIENTE PRIMEIRO
     if (cpf) {
+      let nomeFinal = nome || cliente_nome || clienteNome || req.body.cliente;
+
+      // Se o app não enviou o nome no pedido, tenta buscar no banco se o cliente já existe
+      if (!nomeFinal) {
+        const resBusca = await client.query('SELECT nome FROM cliente WHERE cpf = $1', [cpf]);
+        if (resBusca.rows.length > 0 && resBusca.rows[0].nome !== 'Não informado') {
+          nomeFinal = resBusca.rows[0].nome;
+        } else {
+          nomeFinal = 'Não informado';
+        }
+      }
+
       const queryCliente = `
         INSERT INTO cliente (
           codigo, nome, endereco, cpf, bairro, estado, municipio, cep, email, niver, telefone_1, obs
         )
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
         ON CONFLICT (cpf) DO UPDATE SET
-          nome = EXCLUDED.nome,
+          nome = CASE WHEN EXCLUDED.nome <> 'Não informado' THEN EXCLUDED.nome ELSE cliente.nome END,
           endereco = EXCLUDED.endereco,
           bairro = EXCLUDED.bairro,
           estado = EXCLUDED.estado,
@@ -160,8 +185,6 @@ app.post('/pedidos', async (req, res) => {
           telefone_1 = EXCLUDED.telefone_1,
           obs = EXCLUDED.obs;
       `;
-
-      const nomeFinal = nome || cliente_nome || clienteNome || req.body.cliente || 'Não informado';
 
       const valoresCliente = [
         codigo_cliente || '0001',
@@ -181,6 +204,9 @@ app.post('/pedidos', async (req, res) => {
       await client.query(queryCliente, valoresCliente);
       console.log(`[CLIENTE] CPF ${cpf} (${nomeFinal}) processado.`);
     }
+
+    // CONVERTE A DATA DO BRASIL PARA O FORMATO DO POSTGRES
+    const dataFormatada = formatarDataParaPostgres(data_pedido);
 
     // 2. INSERE O CABEÇALHO DO PEDIDO
     const queryPedido = `
@@ -203,7 +229,7 @@ app.post('/pedidos', async (req, res) => {
     const valoresPedido = [
       cpf, 
       numero, 
-      data_pedido, 
+      dataFormatada, 
       formaPagamento, 
       totalPedido || 0, 
       enderecoEntrega, 
