@@ -22,7 +22,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+
 class activity_dados_pessoais : AppCompatActivity() {
+
+    private var cepAnterior: String? = null
 
     private val viewModel: PerfilViewModel by viewModels {
         object : ViewModelProvider.Factory {
@@ -64,8 +67,8 @@ class activity_dados_pessoais : AppCompatActivity() {
             override fun afterTextChanged(s: Editable?) {
                 val cepFormatado = s.toString().replace("-", "").replace(".", "").trim()
 
-                // Executa a busca assim que preencher os 8 números do CEP
-                if (cepFormatado.length == 8) {
+                // Executa a busca assim que preencher os 8 números do CEP, APENAS se for diferente do anterior
+                if (cepFormatado.length == 8 && cepFormatado != cepAnterior) {
                     consultarEAtualizarEnderecoPorCep(cepFormatado)
                 }
             }
@@ -75,6 +78,9 @@ class activity_dados_pessoais : AppCompatActivity() {
     private fun observarDadosERecuperar() {
         viewModel.dadosPessoaisLiveData.observe(this) { dados ->
             if (dados != null) {
+                // 1. IMPORTANTE: Atualiza o cepAnterior ANTES de alterar o texto do CEP na tela
+                cepAnterior = dados.cep?.replace("-", "")?.replace(".", "")?.trim()
+
                 findViewById<EditText>(R.id.etNome).setText(dados.nome)
                 findViewById<EditText>(R.id.etEndereco).setText(dados.endereco)
                 findViewById<EditText>(R.id.etCpf).setText(dados.cpf)
@@ -82,6 +88,8 @@ class activity_dados_pessoais : AppCompatActivity() {
                 findViewById<EditText>(R.id.etEstado).setText(dados.estado)
                 findViewById<EditText>(R.id.etMunicipio).setText(dados.municipio)
                 findViewById<EditText>(R.id.etTelefone).setText(dados.telefone)
+
+                // Quando o setText do CEP roda aqui, o cepAnterior já está populado!
                 findViewById<EditText>(R.id.etCep).setText(dados.cep ?: "")
             }
         }
@@ -123,6 +131,10 @@ class activity_dados_pessoais : AppCompatActivity() {
         )
 
         viewModel.salvarDadosUsuario(novosDados)
+
+        // Atualiza a referência do cepAnterior após salvar
+        cepAnterior = cep?.replace("-", "")?.replace(".", "")?.trim()
+
         Toast.makeText(this, "Dados salvos com sucesso!", Toast.LENGTH_SHORT).show()
     }
 
@@ -147,54 +159,21 @@ class activity_dados_pessoais : AppCompatActivity() {
                     val etMunicipio = findViewById<EditText>(R.id.etMunicipio)
                     val etEstado = findViewById<EditText>(R.id.etEstado)
 
-                    // SOLUÇÃO 1: Preenche os campos APENAS se estiverem em branco ou vazios
-                    if (etEndereco.text.isNullOrBlank()) {
-                        etEndereco.setText(endereco.logradouro)
-                    }
+                    // Atualiza a referência para evitar consultas em loop/repetidas
+                    cepAnterior = cep
 
-                    if (etBairro.text.isNullOrBlank()) {
-                        etBairro.setText(endereco.bairro)
-                    }
+                    // Preenche a tela com os dados do novo CEP para o usuário complementar se necessário
+                    etEndereco.setText(endereco.logradouro)
+                    etBairro.setText(endereco.bairro)
+                    etMunicipio.setText(endereco.localidade)
+                    etEstado.setText(endereco.uf)
 
-                    if (etMunicipio.text.isNullOrBlank()) {
-                        etMunicipio.setText(endereco.localidade)
-                    }
+                    // Nota: O auto-salvamento no Room foi removido daqui para permitir
+                    // que o usuário digite o número/complemento e salve tudo de uma vez no botão "Salvar".
 
-                    if (etEstado.text.isNullOrBlank()) {
-                        etEstado.setText(endereco.uf)
-                    }
-
-
-
-                    // Resgata o valor final do endereço exibido na tela para salvar no Room
-                    val enderecoFinal = etEndereco.text.toString()
-                    val bairroFinal = etBairro.text.toString()
-
-                    // 2. Grava/Atualiza na tabela DadosPessoais do Room preservando complementos manuais
-                    salvarEnderecoNoRoom(
-                        cep = cep,
-                        logradouro = enderecoFinal,
-                        bairro = bairroFinal
-                    )
                 } else {
                     Toast.makeText(this@activity_dados_pessoais, "CEP não encontrado.", Toast.LENGTH_SHORT).show()
                 }
-            }
-        }
-    }
-
-    private fun salvarEnderecoNoRoom(cep: String, logradouro: String, bairro: String) {
-        val db = AppDatabase.getDatabase(this)
-        lifecycleScope.launch(Dispatchers.IO) {
-            val dadosAtuais = db.DadosPessoaisDao().obterDadosPessoais()
-
-            if (dadosAtuais != null) {
-                val dadosAtualizados = dadosAtuais.copy(
-                    cep = cep,
-                    endereco = logradouro,
-                    bairro = bairro
-                )
-                db.DadosPessoaisDao().salvar(dadosAtualizados)
             }
         }
     }
