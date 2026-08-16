@@ -1,5 +1,6 @@
 package com.example.nuvem
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
@@ -21,7 +22,6 @@ import com.exemplo.meuapp.ui.perfil.PerfilViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-
 
 class activity_dados_pessoais : AppCompatActivity() {
 
@@ -47,9 +47,21 @@ class activity_dados_pessoais : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_dados_pessoais)
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+        // Busca o LinearLayout interno onde o padding será aplicado corretamente
+        val container = findViewById<View>(R.id.llContainer)
+
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { _, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            val ime = insets.getInsets(WindowInsetsCompat.Type.ime()) // Teclado
+
+            // Aplica o padding no LinearLayout sem acumular ou travar
+            container.setPadding(
+                16.dpToPx(this),
+                systemBars.top + 16.dpToPx(this),
+                16.dpToPx(this),
+                maxOf(systemBars.bottom, ime.bottom) + 16.dpToPx(this)
+            )
+
             insets
         }
 
@@ -73,6 +85,11 @@ class activity_dados_pessoais : AppCompatActivity() {
                 }
             }
         })
+    }
+
+    // Função utilitária para converter DP para Pixels dinamicamente
+    private fun Int.dpToPx(context: Context): Int {
+        return (this * context.resources.displayMetrics.density).toInt()
     }
 
     private fun observarDadosERecuperar() {
@@ -167,9 +184,6 @@ class activity_dados_pessoais : AppCompatActivity() {
                     etBairro.setText(endereco.bairro)
                     etMunicipio.setText(endereco.localidade)
                     etEstado.setText(endereco.uf)
-
-                    // Nota: O auto-salvamento no Room foi removido daqui para permitir
-                    // que o usuário digite o número/complemento e salve tudo de uma vez no botão "Salvar".
 
                 } else {
                     Toast.makeText(this@activity_dados_pessoais, "CEP não encontrado.", Toast.LENGTH_SHORT).show()
