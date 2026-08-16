@@ -1,3 +1,5 @@
+console.log("Telefone carregado:", process.env.SEU_TELEFONE);
+console.log("Usuario ClickSend:", process.env.CLICKSEND_USERNAME);
 require('dotenv').config();
 const express = require('express');
 const { Pool } = require('pg');
