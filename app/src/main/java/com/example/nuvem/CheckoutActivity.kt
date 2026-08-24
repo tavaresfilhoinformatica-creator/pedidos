@@ -198,10 +198,11 @@ class CheckoutActivity : AppCompatActivity() {
 
         // Monta a string de observação usando a descrição detalhada
         val obsFinal = if (observacaoDigitada.isNotEmpty()) {
-            "$observacaoDigitada | Pagamento: $descricaoPagamento"
+            "$observacaoDigitada  "
         } else {
-            "Pagamento: $descricaoPagamento"
+            "$observacaoDigitada "
         }
+
 
         val db = AppDatabase.getDatabase(this)
 
