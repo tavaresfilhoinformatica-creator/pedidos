@@ -1,3 +1,5 @@
+console.log("Telefone carregado para envio:", process.env.SEU_TELEFONE);
+console.log("Usuario ClickSend:", process.env.CLICKSEND_USERNAME);
 require('dotenv').config();
 const express = require('express');
 const { Pool } = require('pg');
@@ -26,6 +28,45 @@ function formatarDataParaPostgres(dataStr) {
     return `${ano}-${mes}-${dia}${restoHora}`;
   }
   return dataStr;
+}
+
+// Função para enviar SMS via ClickSend quando um novo pedido for criado
+async function enviarSmsNotificacao(numeroPedido, totalPedido, nomeCliente) {
+  const username = process.env.CLICKSEND_USERNAME;
+  const apiKey = process.env.CLICKSEND_API_KEY;
+  const telefoneDestino = process.env.SEU_TELEFONE;
+
+  if (!username || !apiKey || !telefoneDestino) {
+    console.log("[SMS] Credenciais de SMS não configuradas no arquivo .env");
+    return;
+  }
+
+  const credentials = Buffer.from(`${username}:${apiKey}`).toString('base64');
+  const mensagem = `Novo Pedido #${numeroPedido}! Cliente: ${nomeCliente || 'Não informado'} - Total: R$ ${totalPedido}`;
+
+  try {
+    const response = await fetch("https://rest.clicksend.com/v3/sms/send", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Basic ${credentials}`
+      },
+      body: JSON.stringify({
+        messages: [
+          {
+            source: "node-api",
+            body: mensagem,
+            to: telefoneDestino
+          }
+        ]
+      })
+    });
+
+    const data = await response.json();
+    console.log(`[SMS] Notificação do Pedido #${numeroPedido} processada. Resposta:`, data.response_msg);
+  } catch (error) {
+    console.error("[SMS] Erro ao disparar SMS:", error.message);
+  }
 }
 
 // --- ROTAS DA API ---
@@ -155,9 +196,9 @@ app.post('/pedidos', async (req, res) => {
     await client.query('BEGIN');
 
     // 1. GRAVA OU ATUALIZA O CLIENTE PRIMEIRO
-    if (cpf) {
-      let nomeFinal = nome || cliente_nome || clienteNome || req.body.cliente;
+    let nomeFinal = nome || cliente_nome || clienteNome || req.body.cliente;
 
+    if (cpf) {
       // Se o app não enviou o nome no pedido, tenta buscar no banco se o cliente já existe
       if (!nomeFinal) {
         const resBusca = await client.query('SELECT nome FROM cliente WHERE cpf = $1', [cpf]);
@@ -262,6 +303,9 @@ app.post('/pedidos', async (req, res) => {
     }
 
     await client.query('COMMIT');
+
+    // DISPARAR NOTIFICAÇÃO POR SMS
+    enviarSmsNotificacao(pedidoCriado.numero, totalPedido, nomeFinal);
 
     res.status(201).json({ 
       sucesso: true, 
