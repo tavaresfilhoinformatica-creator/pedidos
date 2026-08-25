@@ -15,51 +15,73 @@
         android:orientation="horizontal"
         android:padding="12dp">
 
+        <!-- Foto do produto -->
         <ImageView
             android:id="@+id/imgProduto"
             android:layout_width="100dp"
             android:layout_height="140dp"
             android:scaleType="centerCrop" />
 
-        <LinearLayout
+        <!-- Painel de conteúdo da direita -->
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:orientation="vertical">
+            android:layout_height="match_parent"
+            android:layout_marginStart="12dp">
 
-            <!-- Nome do Produto -->
-            <TextView
-                android:id="@+id/txtNomeProduto"
+            <!-- Bloco de textos empilhados -->
+            <LinearLayout
+                android:id="@+id/containerTextos"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Nome do Produto"
-                android:textColor="#DC0A0A"
-                android:textSize="18sp"
-                android:textStyle="bold" />
+                android:layout_toStartOf="@id/imgCarrinho"
+                android:orientation="vertical">
 
-            <!-- Preço do Produto -->
-            <TextView
-                android:id="@+id/txtPrecoProduto"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:text="R$ 0,00"
-                android:textColor="#E4E5E9"
-                android:textSize="20sp"
-                android:textStyle="bold" />
+                <!-- Nome do Produto -->
+                <TextView
+                    android:id="@+id/txtNomeProduto"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Nome do Produto"
+                    android:textColor="#DC0A0A"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
 
-            <!-- Descrição / Observação -->
-            <TextView
-                android:id="@+id/txtObsProduto"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:text="Descrição/Observação do produto..."
-                android:textColor="#D4D7E2"
-                android:textSize="18sp"
-                android:textStyle="bold" />
+                <!-- Preço do Produto -->
+                <TextView
+                    android:id="@+id/txtPrecoProduto"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="R$ 0,00"
+                    android:textColor="#E4E5E9"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
 
-        </LinearLayout>
+                <!-- Descrição / Observação -->
+                <TextView
+                    android:id="@+id/txtObsProduto"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="Descrição/Observação do produto..."
+                    android:textColor="#D4D7E2"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+            <!-- Ícone do Carrinho de Compras alinhado no canto inferior direito -->
+            <ImageView
+                android:id="@+id/imgCarrinho"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentBottom="true"
+                android:contentDescription="Carrinho de Compras"
+                android:src="@android:drawable/ic_menu_add"
+                app:tint="#FFFFFF" />
+
+        </RelativeLayout>
 
     </LinearLayout>
 

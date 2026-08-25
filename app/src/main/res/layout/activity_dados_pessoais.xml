@@ -13,11 +13,13 @@
        android:layout_height="wrap_content"
        android:descendantFocusability="afterDescendants"
        android:focusableInTouchMode="true"
-       android:orientation="vertical">
+       android:orientation="vertical"
+       android:padding="24dp">
 
       <TextView
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
+          android:layout_gravity="center_horizontal"
           android:layout_marginBottom="24dp"
           android:fontFamily="sans-serif-black"
           android:text="@string/meusdados"
@@ -117,35 +119,39 @@
           android:textColor="#F2EEEE"
           android:textColorHint="#F2EEEE" />
 
-      <!-- Botão Salvar -->
+      <!-- Botão Salvar (Padronizado) -->
       <Button
           android:id="@+id/btnSalvar"
-          android:layout_width="wrap_content"
+          style="?attr/materialButtonOutlinedStyle"
+          android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:layout_gravity="center"
-          android:layout_marginBottom="8dp"
-          android:backgroundTint="#2A3880"
+          android:layout_marginBottom="16dp"
           android:fontFamily="sans-serif"
           android:onClick="salvarDados"
           android:text="Salvar Dados"
-          android:textColor="#F2EEEE"
-          android:textSize="20sp"
-          android:textStyle="normal" />
+          android:textColor="#FFFFFF"
+          android:textSize="18sp"
+          android:textStyle="bold"
+          app:backgroundTint="#2659F0"
+          app:strokeColor="#FFFFFF"
+          app:strokeWidth="2dp" />
 
-      <!-- Botão Meus Pedidos -->
+      <!-- Botão Meus Pedidos (Padronizado) -->
       <Button
           android:id="@+id/btnMeusPedidos"
-          android:layout_width="wrap_content"
+          style="?attr/materialButtonOutlinedStyle"
+          android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:layout_gravity="center"
-          android:layout_marginBottom="12dp"
-          android:backgroundTint="#2A3880"
+          android:layout_marginBottom="24dp"
           android:fontFamily="sans-serif"
           android:onClick="meusPedidos"
           android:text="Meus Pedidos"
-          android:textColor="#F2EEEE"
-          android:textSize="20sp"
-          android:textStyle="normal" />
+          android:textColor="#FFFFFF"
+          android:textSize="18sp"
+          android:textStyle="bold"
+          app:backgroundTint="#2659F0"
+          app:strokeColor="#FFFFFF"
+          app:strokeWidth="2dp" />
 
       <!-- Botão Voltar -->
       <TextView
