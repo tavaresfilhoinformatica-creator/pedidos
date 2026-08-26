@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#2659F0"
+    android:orientation="vertical"
+    android:padding="16dp"
+    tools:context=".telaPesquisa">
+
+    <ImageView
+        android:id="@+id/imageView2"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        app:srcCompat="@drawable/mensagem" />
+
+    <!-- RadioGroup agrupando os botões de opção -->
+    <RadioGroup
+        android:id="@+id/radioOpcoes"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/tituloOpcao"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="Por Título"
+            android:textColor="#EFEBEB"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <RadioButton
+            android:id="@+id/grupoOpcao"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:text="Por Grupo"
+            android:textColor="#E4DBDB"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+    </RadioGroup>
+
+    <!-- Campo de Pesquisa Texto -->
+    <EditText
+        android:id="@+id/pesqEdit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"
+        android:backgroundTint="#EDE6E6"
+        android:backgroundTintMode="src_over"
+        android:breakStrategy="high_quality"
+        android:ems="10"
+        android:hint="Pesquise aqui, em branco para todos"
+        android:inputType="text"
+        android:textColor="#EFEAEA"
+        android:textColorHint="#F2EBEB"
+        android:visibility="visible" />
+
+    <!-- Spinner posicionado após a caixa de texto e antes do botão -->
+    <Spinner
+        android:id="@+id/spinnerGrupos"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="24dp"
+        android:background="#5F7DF6"
+        android:padding="8dp"
+        android:popupBackground="#5F7DF6"
+        android:textColor="#F0EEEE"
+        android:visibility="gone" />
+
+    <!-- Botão Pesquisar (idêntico ao layout da MainActivity) -->
+    <Button
+        android:id="@+id/btnPesquisar"
+        style="?attr/materialButtonOutlinedStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:fontFamily="sans-serif"
+        android:onClick="pesquisar"
+        android:text="Pesquisar"
+        android:textColor="#FFFFFF"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:backgroundTint="#2659F0"
+        app:strokeColor="#FFFFFF"
+        app:strokeWidth="2dp" />
+
+    <!-- Botão Início -->
+    <TextView
+        android:id="@+id/btnInicio"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginBottom="24dp"
+        android:backgroundTint="#4D4949"
+        android:fontFamily="sans-serif-black"
+        android:onClick="telaInicial"
+        android:text="@string/inicio"
+        android:textColor="#EDE3E3"
+        android:textSize="20sp" />
+
+    <!-- Bloco de Alerta / Modo Demonstração -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="8dp">
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Atenção: aplicativo em modo demonstração"
+            android:textColor="#FFCDD2"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/textView3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:gravity="center"
+            android:text="Os pedidos podem e devem ser enviados, mas não serão entregues."
+            android:textColor="#F0ECEC"
+            android:textSize="16sp" />
+    </LinearLayout>
+
+</LinearLayout>

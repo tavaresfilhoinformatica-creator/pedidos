@@ -1,0 +1,351 @@
+package com.example.nuvem
+
+import android.content.Intent
+import android.graphics.Color
+import android.os.Bundle
+import android.util.Log
+import android.view.View
+import android.view.ViewGroup
+import android.widget.ArrayAdapter
+import android.widget.Button
+import android.widget.EditText
+import android.widget.Spinner
+import android.widget.TextView
+import android.widget.Toast
+import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+
+class CheckoutActivity : AppCompatActivity() {
+
+    private lateinit var edtEndereco: EditText
+    private lateinit var edtBairro: EditText
+    private lateinit var edtCep: EditText
+    private lateinit var edtTelefone: EditText
+    private lateinit var edtObs: EditText
+    private lateinit var spinnerPagamento: Spinner
+    private lateinit var txtTotalCheckout: TextView
+
+    private var cpfCliente: String = "" // Guardará o CPF retornado dos dados pessoais
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        enableEdgeToEdge() // Habilita o modo de tela cheia moderno
+        setContentView(R.layout.activity_checkout)
+
+        // Ajuste dinâmico de Insets para o Teclado
+        val container = findViewById<View>(R.id.llContainer)
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { _, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            val ime = insets.getInsets(WindowInsetsCompat.Type.ime()) // Teclado
+
+            container.setPadding(
+                16.dpToPx(this),
+                systemBars.top + 16.dpToPx(this),
+                16.dpToPx(this),
+                maxOf(systemBars.bottom, ime.bottom) + 16.dpToPx(this)
+            )
+            insets
+        }
+
+        // Referências da Interface
+        val rvItens = findViewById<RecyclerView>(R.id.rvItensCheckout)
+        rvItens.adapter = CarrinhoCheckoutAdapter(CarrinhoManager.itens)
+        txtTotalCheckout = findViewById(R.id.txtTotalCheckout)
+        edtEndereco = findViewById(R.id.edtEndereco)
+        edtBairro = findViewById(R.id.edtBairro)
+        edtCep = findViewById(R.id.edtCep)
+        edtTelefone = findViewById(R.id.edtTelefone)
+        edtObs = findViewById(R.id.edtObs)
+        spinnerPagamento = findViewById(R.id.spinnerPagamento)
+        val btnEnviarPedido = findViewById<Button>(R.id.btnEnviarPedido)
+        val btnContinuarComprando = findViewById<Button>(R.id.btnContinuarComprando)
+
+        // Configuração da Lista do Carrinho
+        rvItens.layoutManager = LinearLayoutManager(this)
+
+        atualizarTotal()
+
+        // Carrega dados locais do Room
+        carregarDadosPessoais()
+        carregarFormasPagamento()
+
+        // Botão Continuar Comprando
+        btnContinuarComprando.setOnClickListener {
+            finish() // Simplesmente volta para a tela anterior sem limpar o carrinho
+        }
+
+        // Botão Enviar Pedido
+        btnEnviarPedido.setOnClickListener {
+            finalizarEGravarPedido()
+        }
+    }
+
+    // Função utilitária para converter DP para Pixels dinamicamente
+    private fun Int.dpToPx(context: android.content.Context): Int {
+        return (this * context.resources.displayMetrics.density).toInt()
+    }
+
+    private fun atualizarTotal() {
+        val total = CarrinhoManager.calcularTotal()
+        txtTotalCheckout.text = String.format("Total: R$ %.2f", total)
+    }
+
+    private fun carregarDadosPessoais() {
+        val db = AppDatabase.getDatabase(this)
+        lifecycleScope.launch(Dispatchers.IO) {
+            // Busca o primeiro registro de dados pessoais salvo no Room
+            val dados = db.DadosPessoaisDao().obterDadosPessoais()
+            withContext(Dispatchers.Main) {
+                dados?.let {
+
+                    cpfCliente = it.cpf
+                    edtEndereco.setText(it.endereco)
+                    edtBairro.setText(it.bairro)
+                    edtCep.setText(it.cep)
+                    edtTelefone.setText(it.telefone)
+                }
+            }
+        }
+    }
+
+    private fun carregarFormasPagamento() {
+        val db = AppDatabase.getDatabase(this)
+
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                val pagamentosApi = RetrofitClient.apiService.obterTodas()
+                if (pagamentosApi.isNotEmpty()) {
+                    db.PagamentoDao().inserirPagamentos(pagamentosApi)
+                }
+            } catch (e: Exception) {
+                Log.e("PAGAMENTO_TESTE", "Erro ao buscar do Retrofit: ${e.message}", e)
+            }
+
+            // Busca os objetos completos do Room
+            val formas = db.PagamentoDao().obterTodas()
+
+            withContext(Dispatchers.Main) {
+                if (formas.isNotEmpty()) {
+                    val adapter = object : ArrayAdapter<Pagamento>(
+                        this@CheckoutActivity,
+                        android.R.layout.simple_spinner_item,
+                        formas
+                    ) {
+                        override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+                            val view = super.getView(position, convertView, parent) as TextView
+                            view.setTextColor(Color.WHITE)
+                            view.text = getItem(position)?.descricao // Exibe a descrição no Spinner
+                            return view
+                        }
+
+                        override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup): View {
+                            val view = super.getDropDownView(position, convertView, parent) as TextView
+                            view.setTextColor(Color.WHITE)
+                            view.text = getItem(position)?.descricao // Exibe a descrição no dropdown
+                            return view
+                        }
+                    }
+                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                    spinnerPagamento.adapter = adapter
+                } else {
+                    Toast.makeText(this@CheckoutActivity, "Nenhuma forma de pagamento cadastrada.", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
+    private fun finalizarEGravarPedido() {
+        if (CarrinhoManager.itens.isEmpty()) {
+            Toast.makeText(this, "Seu carrinho está vazio!", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        if (cpfCliente.isBlank()) {
+            Toast.makeText(this, "CPF do cliente não encontrado nos Dados Pessoais.", Toast.LENGTH_LONG).show()
+            return
+        }
+
+        val endereco = edtEndereco.text.toString().trim()
+        val bairro = edtBairro.text.toString().trim()
+        val cep = edtCep.text.toString().trim()
+        val telefone = edtTelefone.text.toString().trim()
+        val observacaoDigitada = edtObs.text.toString().trim()
+
+        if (endereco.isEmpty() || telefone.isEmpty()) {
+            Toast.makeText(this, "Preencha o endereço e telefone para entrega.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        // Resgata o objeto Pagamento selecionado no Spinner
+        val pagamentoSelecionado = spinnerPagamento.selectedItem as? Pagamento
+
+        // Código de 2 caracteres enviado para a API/Aiven (ex: "01")
+        val codigoPagamento = pagamentoSelecionado?.codigo ?: "01"
+
+        // Descrição completa usada na observação
+        val descricaoPagamento = pagamentoSelecionado?.descricao ?: "Não informado"
+
+        // Monta a string de observação usando a descrição detalhada
+        val obsFinal = if (observacaoDigitada.isNotEmpty()) {
+            "$observacaoDigitada  "
+        } else {
+            "$observacaoDigitada "
+        }
+
+
+        val db = AppDatabase.getDatabase(this)
+
+        lifecycleScope.launch(Dispatchers.IO) {
+            // 1. Busca os dados pessoais do cliente no Room primeiro
+            val dadosPessoais = db.DadosPessoaisDao().obterDadosPessoais()
+            val nomeCliente = dadosPessoais?.nome ?: ""
+
+            // Envia o cliente de forma síncrona/aguardando a conclusão
+            if (dadosPessoais != null) {
+                enviarClienteParaAiven(dadosPessoais)
+            } else {
+                Log.w("AIVEN_SYNC", "Dados Pessoais não encontrados no banco local antes do envio do pedido.")
+            }
+
+            // 2. Gera o próximo número de pedido para este CPF
+            val ultimoNumero = db.pedidoDao().obterUltimoNumeroPedidoPorCpf(cpfCliente) ?: 0
+            val novoNumeroPedido = ultimoNumero + 1
+
+            val totalPedido = CarrinhoManager.calcularTotal()
+
+            // 3. Instancia a Entity Pedido gravando a Observação
+            val pedido = Pedido(
+                cpf = cpfCliente,
+                numero = novoNumeroPedido,
+                total_pedido = totalPedido,
+                endereco_entrega = endereco,
+                bairro_entrega = bairro,
+                cep_entrega = cep,
+                telefone_entrega = telefone,
+                obs = obsFinal
+            )
+
+            // 4. Mapeia os itens do carrinho para ItemPedido
+            val listaItensPedido = CarrinhoManager.itens.map { item ->
+                ItemPedido(
+                    cpf = cpfCliente,
+                    pedido = novoNumeroPedido.toString(),
+                    produto = item.produtoId,
+                    descricao = item.nomeProduto,
+                    quantidade = item.quantidade,
+                    preco_venda = item.precoUnitario,
+                    total_item = item.totalItem
+                )
+            }
+
+            // 5. Salva no Room local primeiro
+            db.pedidoDao().inserirPedido(pedido)
+            db.pedidoDao().inserirItensPedido(listaItensPedido)
+
+            // 6. AGUARDA o envio para o Aiven passar o nome do cliente e o codigoPagamento (2 dígitos)
+            enviarPedidoParaAiven(pedido, listaItensPedido, codigoPagamento.toString(), nomeCliente)
+
+            // 7. Transição de tela executada somente após a sincronização
+            withContext(Dispatchers.Main) {
+                CarrinhoManager.limpar()
+                Toast.makeText(this@CheckoutActivity, "Pedido #$novoNumeroPedido realizado com sucesso!", Toast.LENGTH_LONG).show()
+
+                // Redireciona para a tela inicial/cardápio
+                val intent = Intent(this@CheckoutActivity, cardapio::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+                startActivity(intent)
+                finish()
+            }
+        }
+    }
+
+    private suspend fun enviarPedidoParaAiven(
+        pedido: Pedido,
+        itens: List<ItemPedido>,
+        formaPagamento: String,
+        nomeCliente: String
+    ) {
+        try {
+            // Data atual formatada no padrão DD-MM-YYYY HH:mm:ss
+            val dataFormatada = SimpleDateFormat("dd-MM-yyyy HH:mm:ss", Locale.getDefault()).format(Date())
+
+            val requestAiven = PedidoAivenRequest(
+                cpf = pedido.cpf,
+                nome = nomeCliente, // Envia o nome retornado dos dados pessoais
+                numero = pedido.numero,
+                data_pedido = dataFormatada,
+                formaPagamento = formaPagamento, // Envia o código de 2 caracteres
+                totalPedido = pedido.total_pedido.toDouble(),
+                enderecoEntrega = pedido.endereco_entrega,
+                bairroEntrega = pedido.bairro_entrega,
+                telefoneEntrega = pedido.telefone_entrega,
+                obs = pedido.obs,
+                cep_Entrega = pedido.cep_entrega,
+                itens = itens.map { item ->
+                    ItemPedidoAivenRequest(
+                        cpf = item.cpf,
+                        numero = item.pedido.toIntOrNull() ?: pedido.numero,
+                        produtoId = item.produto.toLongOrNull() ?: 0L,
+                        descricao = item.descricao,
+                        quantidade = item.quantidade,
+                        precoVenda = item.preco_venda.toDouble(),
+                        totalItem = item.total_item.toDouble()
+                    )
+                }
+            )
+
+            val resposta = RetrofitClient.apiService.enviarPedidoAiven(requestAiven)
+
+            withContext(Dispatchers.Main) {
+                if (resposta.isSuccessful && resposta.body()?.sucesso == true) {
+                    Log.d("AIVEN_SYNC", "Pedido #${pedido.numero} sincronizado com o Aiven com sucesso!")
+                } else {
+                    Log.e("AIVEN_SYNC", "Falha ao sincronizar com Aiven: ${resposta.errorBody()?.string()}")
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("AIVEN_SYNC", "Erro de conexão ao enviar para o Aiven: ${e.message}", e)
+        }
+    }
+
+    private suspend fun enviarClienteParaAiven(dados: DadosPessoais) {
+        try {
+            val requestCliente = ClienteAivenRequest(
+                codigo = dados.codigo.toString().padStart(4, '0'), // Garante formato CHAR(4)
+                nome = dados.nome,
+                endereco = dados.endereco,
+                cpf = dados.cpf,
+                bairro = dados.bairro,
+                estado = if (dados.estado.isBlank()) "RJ" else dados.estado,
+                municipio = if (dados.municipio.isBlank()) "RIO DE JANEIRO" else dados.municipio,
+                cep = dados.cep ?: "",
+                email = dados.email ?: "",
+                niver = dados.niver ?: "",
+                telefone_1 = dados.telefone
+            )
+
+            val resposta = RetrofitClient.apiService.cadastrarClienteAiven(requestCliente)
+
+            withContext(Dispatchers.Main) {
+                if (resposta.isSuccessful) {
+                    Log.d("AIVEN_SYNC", "Cliente CPF ${dados.cpf} sincronizado com sucesso!")
+                } else {
+                    Log.e("AIVEN_SYNC", "Erro ao sincronizar cliente: ${resposta.errorBody()?.string()}")
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("AIVEN_SYNC", "Erro de conexão ao enviar cliente: ${e.message}", e)
+        }
+    }
+}

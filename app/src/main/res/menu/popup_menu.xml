@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/dadosPessoais"
+        android:title="Dados Pessoais" />
+    <item
+        android:id="@+id/criarPedido"
+        android:title="Criar Pedidos" />
+    <item
+        android:id="@+id/sair"
+        android:title="Sair" />
+</menu>
