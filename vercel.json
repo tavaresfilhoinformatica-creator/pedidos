@@ -1,9 +1,19 @@
 {
-  "cleanUrls": true,
+  "headers": [
+    {
+      "source": "/furabolo.apk",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/vnd.android.package-archive"
+        }
+      ]
+    }
+  ],
   "rewrites": [
     {
       "source": "/(.*)",
-      "destination": "/$1"
+      "destination": "/index.html"
     }
   ]
 }
