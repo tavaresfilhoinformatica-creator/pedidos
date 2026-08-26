@@ -1,19 +1,26 @@
 {
-  "headers": [
+  "version": 2,
+  "builds": [
     {
-      "source": "/furabolo.apk",
-      "headers": [
-        {
-          "key": "Content-Type",
-          "value": "application/vnd.android.package-archive"
-        }
-      ]
+      "src": "index.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "index.html",
+      "use": "@vercel/static"
     }
   ],
-  "rewrites": [
+  "routes": [
     {
-      "source": "/(.*)",
-      "destination": "/index.html"
+      "src": "/furabolo.apk",
+      "headers": {
+        "Content-Type": "application/vnd.android.package-archive"
+      },
+      "continue": true
+    },
+    {
+      "src": "/(.*)",
+      "dest": "index.js"
     }
   ]
 }
