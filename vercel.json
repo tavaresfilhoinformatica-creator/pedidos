@@ -1,7 +1,7 @@
 {
   "headers": [
     {
-      "source": "/furabolo.apk",
+      "source": "/public/furabolo.apk",
       "headers": [
         {
           "key": "Content-Type",
@@ -12,16 +12,6 @@
           "value": "attachment; filename=furabolo.apk"
         }
       ]
-    }
-  ],
-  "rewrites": [
-    {
-      "source": "/furabolo.apk",
-      "destination": "/public/furabolo.apk"
-    },
-    {
-      "source": "/(.*)",
-      "destination": "/index.html"
     }
   ]
 }
