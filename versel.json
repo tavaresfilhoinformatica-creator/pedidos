@@ -1,7 +1,7 @@
 {
   "headers": [
     {
-      "source": "/FuraBolo.apk",
+      "source": "/furabolo.apk",
       "headers": [
         {
           "key": "Content-Type",
