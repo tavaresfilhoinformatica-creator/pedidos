@@ -16,6 +16,10 @@
   ],
   "rewrites": [
     {
+      "source": "/furabolo.apk",
+      "destination": "/public/furabolo.apk"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
