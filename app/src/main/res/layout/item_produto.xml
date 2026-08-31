@@ -8,11 +8,10 @@
     app:cardCornerRadius="12dp"
     app:cardElevation="4dp">
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#062DC8"
-        android:orientation="horizontal"
         android:padding="12dp">
 
         <!-- Foto do produto -->
@@ -20,69 +19,64 @@
             android:id="@+id/imgProduto"
             android:layout_width="100dp"
             android:layout_height="140dp"
-            android:scaleType="centerCrop" />
+            android:scaleType="centerCrop"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-        <!-- Painel de conteúdo da direita -->
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginStart="12dp">
+        <!-- Nome do Produto -->
+        <TextView
+            android:id="@+id/txtNomeProduto"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:text="Nome do Produto"
+            android:textColor="#DC0A0A"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/imgProduto"
+            app:layout_constraintTop_toTopOf="parent" />
 
-            <!-- Bloco de textos empilhados -->
-            <LinearLayout
-                android:id="@+id/containerTextos"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_toStartOf="@id/imgCarrinho"
-                android:orientation="vertical">
+        <!-- Preço do Produto -->
+        <TextView
+            android:id="@+id/txtPrecoProduto"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:text="R$ 0,00"
+            android:textColor="#E4E5E9"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@id/txtNomeProduto"
+            app:layout_constraintTop_toBottomOf="@id/txtNomeProduto" />
 
-                <!-- Nome do Produto -->
-                <TextView
-                    android:id="@+id/txtNomeProduto"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Nome do Produto"
-                    android:textColor="#DC0A0A"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
+        <!-- Descrição / Observação (Sem limitação de altura) -->
+        <TextView
+            android:id="@+id/txtObsProduto"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="8dp"
+            android:text="Descrição/Observação do produto..."
+            android:textColor="#D4D7E2"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toStartOf="@id/imgCarrinho"
+            app:layout_constraintStart_toStartOf="@id/txtNomeProduto"
+            app:layout_constraintTop_toBottomOf="@id/txtPrecoProduto" />
 
-                <!-- Preço do Produto -->
-                <TextView
-                    android:id="@+id/txtPrecoProduto"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
-                    android:text="R$ 0,00"
-                    android:textColor="#E4E5E9"
-                    android:textSize="20sp"
-                    android:textStyle="bold" />
+        <!-- Ícone do Carrinho (Fixo no canto inferior direito) -->
+        <ImageView
+            android:id="@+id/imgCarrinho"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:contentDescription="Carrinho de Compras"
+            android:src="@android:drawable/ic_menu_add"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:tint="#FFFFFF" />
 
-                <!-- Descrição / Observação -->
-                <TextView
-                    android:id="@+id/txtObsProduto"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="Descrição/Observação do produto..."
-                    android:textColor="#D4D7E2"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
-
-            </LinearLayout>
-
-            <!-- Ícone do Carrinho de Compras alinhado no canto inferior direito -->
-            <ImageView
-                android:id="@+id/imgCarrinho"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentBottom="true"
-                android:contentDescription="Carrinho de Compras"
-                android:src="@android:drawable/ic_menu_add"
-                app:tint="#FFFFFF" />
-
-        </RelativeLayout>
-
-    </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.cardview.widget.CardView>
